@@ -1,0 +1,143 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f5f7fb;
+  --text: #1f2933;
+  --card-bg: #ffffff;
+  --accent: #2563eb;
+  --accent-text: #ffffff;
+  --muted: #52606d;
+  --error: #dc2626;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+a {
+  color: var(--accent);
+}
+
+.container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.site-header {
+  background: var(--card-bg);
+  border-bottom: 1px solid rgba(31, 41, 51, 0.08);
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.tagline {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(31, 41, 51, 0.08);
+  padding: 1.75rem;
+  margin-top: 1.75rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.primary-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.5rem 1.5rem;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primary-btn[disabled] {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.primary-btn:hover:not([disabled]),
+.primary-btn:focus:not([disabled]) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
+}
+
+.primary-btn:active:not([disabled]) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.ip-reading {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 1.5rem 0 0;
+  word-break: break-all;
+}
+
+.ip-source {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.error-message {
+  margin: 0.75rem 0 0;
+  color: var(--error);
+  font-weight: 500;
+  min-height: 1.25rem;
+}
+
+.roadmap ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.roadmap li {
+  margin-bottom: 0.5rem;
+}
+
+.site-footer {
+  text-align: center;
+  margin: 3rem 0 2rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+@media (max-width: 600px) {
+  .card {
+    padding: 1.25rem;
+  }
+
+  .ip-reading {
+    font-size: 2rem;
+  }
+}
