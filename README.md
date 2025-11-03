@@ -13,7 +13,8 @@ Plumber is evolving into a TypeScript + React frontend paired with a lightweight
 2. Start the Go server in a separate terminal:
 
    ```bash
-   go run ./cmd/server
+   cd ./server
+   go run main.go
    ```
 
    The server listens on `:8080` by default. Set the `PORT` environment variable to override it.
@@ -42,6 +43,7 @@ npm run preview
 ## Available features
 
 - **Public IP display** – Fetches your current public IPv4 address from the Go server, which inspects client headers (`X-Forwarded-For`, `X-Real-IP`, or `RemoteAddr`) and returns the determined address. If the server is unavailable, the frontend falls back to AWS’s `checkip.amazonaws.com`.
+- **CIDR utilities** – Calculates network, broadcast, usable ranges, and host counts for IPv4 CIDRs, and checks whether a given IP resides within the specified block.
 
 ## Roadmap
 
