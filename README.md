@@ -1,33 +1,24 @@
 # plumber
 
-Plumber is evolving into a TypeScript + React frontend paired with a lightweight Go server for gathering networking insights. The long-term goal is to surface IP intelligence, CIDR math, ownership discovery, and connectivity diagnostics from one cohesive toolbox.
+Plumber is a TypeScript + React playground for quick networking diagnostics directly in the browser. The experience will continue to expand into IP intelligence, CIDR math, DNS insights, ownership discovery, and connectivity checks—without any backend services required.
 
 ## Quick start
 
-1. Install frontend dependencies (Node.js 18+ recommended):
+1. Install dependencies (Node.js 18+ recommended):
 
    ```bash
    npm install
    ```
 
-2. Start the Go server in a separate terminal:
-
-   ```bash
-   cd ./server
-   go run main.go
-   ```
-
-   The server listens on `:8080` by default. Set the `PORT` environment variable to override it.
-
-3. With the server running, launch the Vite dev server:
+2. Launch the Vite dev server:
 
    ```bash
    npm run dev
    ```
 
-4. Open the printed URL (default `http://localhost:5173`). The Vite dev server proxies `/server/*` requests to the Go backend, so the browser and server stay in sync during development.
+3. Open the printed URL (default `http://localhost:5173`) to explore the tools.
 
-To produce an optimized frontend build:
+To produce an optimized build:
 
 ```bash
 npm run build
@@ -36,22 +27,23 @@ npm run preview
 
 ## Architecture highlights
 
-- **React UI shell (with TypeScript)** – Manages layout, state, and future routing for the growing toolbox while keeping types front-and-center.
-- **Go server gateway** – Exposes networking primitives starting with `/server/public-ip`, derived directly from the incoming request so no third-party IP service is required.
-- **Vite toolchain** – Provides fast iteration now and a path to future TypeScript- or test-oriented integrations, with a built-in proxy for local server development.
+- **React UI shell (with TypeScript)** – Manages layout, state, and the tabbed experience for networking utilities.
+- **Browser-native APIs** – Public IP and DNS lookups query trusted third-party endpoints directly from the browser, avoiding any custom backend.
+- **Vite toolchain** – Provides fast iteration now and a path to future TypeScript- or test-oriented integrations.
+- **Adaptive theming** – Automatic dark mode support follows the user’s OS preference without extra configuration.
 
 ## Available features
 
-- **Public IP display** – Fetches your current public IPv4 address from the Go server, which inspects client headers (`X-Forwarded-For`, `X-Real-IP`, or `RemoteAddr`) and returns the determined address. If the server is unavailable, the frontend falls back to AWS’s `checkip.amazonaws.com`.
+- **IP insights** – Fetches your current public IPv4 address from trusted external services.
 - **CIDR utilities** – Calculates network, broadcast, usable ranges, and host counts for IPv4 CIDRs, and checks whether a given IP resides within the specified block.
+- **DNS lookups (beta)** – Retrieves DNS record values for common record types, aggregates duplicate answers, surfaces WHOIS snapshots, and scaffolds global propagation tracking with an interactive world map.
 
 ## Roadmap
 
-- CIDR calculators and IP inclusion checks.
+- Additional DNS diagnostics (propagation timings, provider comparisons, DNSSEC).
 - ASN and BGP ownership lookups.
-- DNS record inspection and propagation visibility.
 - Connectivity probes (ping, curl, traceroute, MTR, iperf) with progressive enhancement for browsers/workers that can support them.
 
 ## Contributing
 
-Ideas and pull requests are welcome as the TypeScript + Go experience takes shape. Open an issue to discuss new networking diagnostics or improvements to the existing flow.
+Ideas and pull requests are welcome as the TypeScript experience takes shape. Open an issue to discuss new networking diagnostics or improvements to the existing flow.

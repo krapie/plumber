@@ -7,34 +7,33 @@ interface UsePublicIpResult {
   refresh: () => Promise<void>;
 }
 
-interface PublicIpPayload {
+interface IpifyPayload {
   ip: string;
-  source?: string;
 }
 
-const SERVER_ENDPOINT = "/server/public-ip";
+const IPIFY_URL = "https://api.ipify.org?format=json";
 const CHECK_IP_URL = "https://checkip.amazonaws.com";
 const IPV4_REGEX =
   /^(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$/;
 
-async function fetchFromServer(): Promise<string> {
-  const response = await fetch(SERVER_ENDPOINT, {
+async function fetchFromIpify(): Promise<string> {
+  const response = await fetch(IPIFY_URL, {
     cache: "no-store",
     headers: { Accept: "application/json" },
   });
 
   if (!response.ok) {
-    throw new Error(`Server responded with status ${response.status}`);
+    throw new Error(`Primary provider responded with status ${response.status}`);
   }
 
-  const payload = (await response.json()) as Partial<PublicIpPayload>;
+  const payload = (await response.json()) as Partial<IpifyPayload>;
 
   if (!payload.ip || typeof payload.ip !== "string") {
-    throw new Error("Server response did not include an IP address.");
+    throw new Error("Primary provider response did not include an IP address.");
   }
 
   if (!IPV4_REGEX.test(payload.ip)) {
-    throw new Error("Server response contained an invalid IPv4 address.");
+    throw new Error("Primary provider response contained an invalid IPv4 address.");
   }
 
   return payload.ip;
@@ -67,16 +66,16 @@ export function usePublicIp(): UsePublicIpResult {
     setError("");
 
     try {
-      const serverIp = await fetchFromServer();
-      setIp(serverIp);
+      const primaryIp = await fetchFromIpify();
+      setIp(primaryIp);
     } catch (err) {
       try {
         const fallbackIp = await fetchFromCheckip();
         setIp(fallbackIp);
         if (err instanceof Error) {
-          console.warn("Server lookup failed. Using fallback provider:", err);
+          console.warn("Primary lookup failed. Using fallback provider:", err);
         } else {
-          console.warn("Server lookup failed. Using fallback provider.");
+          console.warn("Primary lookup failed. Using fallback provider.");
         }
         setError("");
       } catch (fallbackErr) {

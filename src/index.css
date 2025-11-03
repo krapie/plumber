@@ -5,10 +5,65 @@
   --card-bg: #ffffff;
   --accent: #2563eb;
   --accent-text: #ffffff;
+  --accent-soft: rgba(37, 99, 235, 0.12);
   --muted: #52606d;
   --error: #dc2626;
+  --border: rgba(31, 41, 51, 0.12);
+  --border-strong: rgba(31, 41, 51, 0.25);
+  --surface: rgba(255, 255, 255, 0.6);
+  --surface-strong: rgba(255, 255, 255, 0.65);
+  --map-land: #bfdbfe;
+  --map-land-strong: #93c5fd;
+  --region-default: rgba(37, 99, 235, 0.65);
+  --region-default-stroke: #1d4ed8;
+  --region-pending: rgba(245, 158, 11, 0.8);
+  --region-pending-stroke: #d97706;
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f5f7fb;
+  --text: #1f2933;
+  --card-bg: #ffffff;
+  --accent: #2563eb;
+  --accent-text: #ffffff;
+  --accent-soft: rgba(37, 99, 235, 0.12);
+  --muted: #52606d;
+  --error: #dc2626;
+  --border: rgba(31, 41, 51, 0.12);
+  --border-strong: rgba(31, 41, 51, 0.25);
+  --surface: rgba(255, 255, 255, 0.6);
+  --surface-strong: rgba(255, 255, 255, 0.65);
+  --map-land: #bfdbfe;
+  --map-land-strong: #93c5fd;
+  --region-default: rgba(37, 99, 235, 0.65);
+  --region-default-stroke: #1d4ed8;
+  --region-pending: rgba(245, 158, 11, 0.8);
+  --region-pending-stroke: #d97706;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f172a;
+  --text: #e2e8f0;
+  --card-bg: rgba(15, 23, 42, 0.92);
+  --accent: #3b82f6;
+  --accent-text: #e2e8f0;
+  --accent-soft: rgba(59, 130, 246, 0.25);
+  --muted: #94a3b8;
+  --error: #f87171;
+  --border: rgba(148, 163, 184, 0.35);
+  --border-strong: rgba(148, 163, 184, 0.45);
+  --surface: rgba(30, 41, 59, 0.75);
+  --surface-strong: rgba(30, 41, 59, 0.85);
+  --map-land: #1d4ed8;
+  --map-land-strong: #2563eb;
+  --region-default: rgba(56, 189, 248, 0.85);
+  --region-default-stroke: #0ea5e9;
+  --region-pending: rgba(249, 115, 22, 0.75);
+  --region-pending-stroke: #ea580c;
 }
 
 * {
@@ -34,15 +89,15 @@ a {
 }
 
 .header-flex {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
   gap: 1.5rem;
 }
 
 .site-header {
   background: var(--card-bg);
-  border-bottom: 1px solid rgba(31, 41, 51, 0.08);
+  border-bottom: 1px solid var(--border);
 }
 
 .site-header h1 {
@@ -53,6 +108,7 @@ a {
 .card {
   background: var(--card-bg);
   border-radius: 16px;
+  border: 1px solid var(--border);
   box-shadow: 0 12px 24px rgba(31, 41, 51, 0.08);
   padding: 1.75rem;
   margin-top: 1.75rem;
@@ -131,6 +187,7 @@ a {
 .tab-nav {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0;
   flex-wrap: wrap;
@@ -138,7 +195,7 @@ a {
 
 .tab-button {
   appearance: none;
-  border: 1px solid rgba(31, 41, 51, 0.12);
+  border: 1px solid var(--border);
   background: transparent;
   color: var(--muted);
   border-radius: 999px;
@@ -162,6 +219,30 @@ a {
   box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
 }
 
+.theme-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.theme-select select {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.35rem 1rem 0.35rem 0.75rem;
+  font-size: 0.95rem;
+  background: var(--card-bg);
+  color: var(--text);
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.theme-select select:focus {
+  outline: none;
+  border-color: rgba(37, 99, 235, 0.9);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
 .input-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -180,14 +261,35 @@ a {
 }
 
 .input-block input {
-  border: 1px solid rgba(31, 41, 51, 0.2);
+  border: 1px solid var(--border-strong);
   border-radius: 10px;
   padding: 0.6rem 0.75rem;
   font-size: 1rem;
   transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
+.input-block select {
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
+  font-size: 1rem;
+  background: var(--card-bg);
+  color: var(--text);
+  transition: border 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.input-block select option {
+  color: var(--text);
+  background: var(--card-bg);
+}
+
 .input-block input:focus {
+  outline: none;
+  border-color: rgba(37, 99, 235, 0.9);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.input-block select:focus {
   outline: none;
   border-color: rgba(37, 99, 235, 0.9);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
@@ -200,12 +302,6 @@ a {
 .input-hint {
   font-size: 0.85rem;
   color: var(--error);
-}
-
-.cidr-quick-summary {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
 }
 
 .cidr-inclusion {
@@ -231,10 +327,10 @@ a {
 }
 
 .cidr-details {
-  border: 1px solid rgba(31, 41, 51, 0.12);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1rem 1.25rem;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--surface);
 }
 
 .cidr-details dl {
@@ -261,6 +357,201 @@ a {
   color: var(--muted);
 }
 
+.dns-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.dns-form .primary-btn {
+  justify-self: start;
+}
+
+.dns-records {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.dns-records li {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.35rem;
+}
+
+.dns-record-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dns-record-name {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.dns-record-type {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  text-transform: uppercase;
+}
+
+.dns-record-value {
+  font-family: "Roboto Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco,
+    Consolas, "Liberation Mono", "Courier New", monospace;
+  word-break: break-word;
+}
+
+.dns-record-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.dns-record-count {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-weight: 600;
+}
+
+.dns-record-ttl {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.dns-propagation {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dns-propagation header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.dns-propagation header p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+}
+
+.dns-map {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  background: var(--surface-strong);
+}
+
+.dns-map svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.dns-region {
+  fill: var(--region-default);
+  stroke: var(--region-default-stroke);
+  stroke-width: 2;
+}
+
+.dns-region--pending {
+  fill: var(--region-pending);
+  stroke: var(--region-pending-stroke);
+}
+
+.dns-region-label {
+  font-size: 0.8rem;
+  fill: var(--text);
+}
+
+.dns-map-footnote {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.dns-whois {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.dns-whois header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.dns-whois header p {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+}
+
+.dns-whois-status {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.dns-whois-status--error {
+  color: var(--error);
+}
+
+.dns-whois-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem 1.5rem;
+  margin: 0;
+}
+
+.dns-whois-details dt {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.dns-whois-details dd {
+  margin: 0.25rem 0 0;
+  word-break: break-word;
+}
+
+.dns-whois-statuses dd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.dns-whois-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.8rem;
+  text-transform: lowercase;
+}
+
 .roadmap ul {
   margin: 0;
   padding-left: 1.25rem;
@@ -279,9 +570,8 @@ a {
 
 @media (max-width: 600px) {
   .header-flex {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .card {
@@ -294,9 +584,52 @@ a {
 
   .tab-nav {
     padding: 0 1rem 1rem;
+    justify-content: flex-start;
   }
 
   .cidr-details dl {
     grid-template-columns: 1fr;
   }
+
+  .dns-form {
+    grid-template-columns: 1fr;
+  }
+
+  .dns-form .primary-btn {
+    justify-self: stretch;
+  }
+
+  .theme-select {
+    align-self: flex-start;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg: #0f172a;
+    --text: #e2e8f0;
+    --card-bg: rgba(15, 23, 42, 0.92);
+    --accent: #3b82f6;
+    --accent-text: #e2e8f0;
+    --accent-soft: rgba(59, 130, 246, 0.25);
+    --muted: #94a3b8;
+    --error: #f87171;
+    --border: rgba(148, 163, 184, 0.25);
+    --border-strong: rgba(148, 163, 184, 0.35);
+    --surface: rgba(30, 41, 59, 0.75);
+    --surface-strong: rgba(30, 41, 59, 0.85);
+    --map-land: #1d4ed8;
+    --map-land-strong: #2563eb;
+    --region-default: rgba(56, 189, 248, 0.85);
+    --region-default-stroke: #0ea5e9;
+    --region-pending: rgba(249, 115, 22, 0.75);
+    --region-pending-stroke: #ea580c;
+  }
+}
+
+.cidr-quick-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }

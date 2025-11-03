@@ -1,12 +1,15 @@
 import { useState, type ReactElement } from "react";
 import { usePublicIp } from "./hooks/usePublicIp";
 import { CidrTool } from "./components/CidrTool";
+import { DnsTool } from "./components/DnsTool";
+import { useTheme, type ThemePreference } from "./hooks/useTheme";
 
-type TabKey = "ip" | "cidr";
+type TabKey = "ip" | "cidr" | "dns";
 
 const tabs: Array<{ key: TabKey; label: string }> = [
   { key: "ip", label: "IP" },
   { key: "cidr", label: "CIDR" },
+  { key: "dns", label: "DNS" },
 ];
 
 function IpPanel(): JSX.Element {
@@ -31,10 +34,6 @@ function IpPanel(): JSX.Element {
         <p className="ip-reading" aria-live="polite" aria-busy={loading}>
           {loading ? "Loading..." : ip || "Unavailable"}
         </p>
-        <p className="ip-source">
-          Primary lookup comes from the Plumber server to report your public address. If it is
-          unavailable, the UI falls back to AWS&apos;s checkip service.
-        </p>
         {error && (
           <p className="error-message" role="alert">
             {error}
@@ -50,9 +49,9 @@ function Roadmap(): ReactElement {
     <section className="roadmap card" aria-labelledby="roadmap-title">
       <h2 id="roadmap-title">Coming Soon</h2>
       <ul>
-        <li>CIDR calculators and IP inclusion checks.</li>
+        <li>IPv6 CIDR and subnetting helpers.</li>
         <li>Ownership lookups (WHOIS, BGP ASN).</li>
-        <li>DNS record inspection and propagation tracking.</li>
+        <li>Live DNS propagation checks and provider comparisons.</li>
         <li>Connectivity diagnostics (ping, curl, traceroute, MTR, iperf).</li>
       </ul>
     </section>
@@ -61,12 +60,13 @@ function Roadmap(): ReactElement {
 
 export default function App(): ReactElement {
   const [activeTab, setActiveTab] = useState<TabKey>("ip");
+  const [theme, setTheme] = useTheme();
 
   return (
     <>
       <header className="site-header">
         <div className="container header-flex">
-          <h1>Plumber</h1>
+          <h1 className="brand-title">Plumber</h1>
           <nav className="tab-nav" aria-label="Feature selection">
             {tabs.map((tab) => (
               <button
@@ -80,12 +80,23 @@ export default function App(): ReactElement {
               </button>
             ))}
           </nav>
+          <label className="theme-select" aria-label="Theme">
+            <select
+              value={theme}
+              onChange={(event) => setTheme(event.target.value as ThemePreference)}
+            >
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
         </div>
       </header>
 
       <main className="container">
         {activeTab === "ip" && <IpPanel />}
         {activeTab === "cidr" && <CidrTool />}
+        {activeTab === "dns" && <DnsTool />}
 
         <Roadmap />
       </main>
