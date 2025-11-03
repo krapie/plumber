@@ -1,4 +1,9 @@
 import { FormEvent, useMemo, useState } from "react";
+import {
+  fetchDomainWhois,
+  formatTimestamp,
+  type WhoisDomainSummary,
+} from "../utils/whois";
 
 type RecordType = "A" | "AAAA" | "CNAME" | "TXT" | "MX" | "NS";
 
@@ -23,33 +28,6 @@ interface DnsRecord {
 
 interface AggregatedRecord extends DnsRecord {
   count: number;
-}
-
-interface RdapEntity {
-  roles?: string[];
-  objectName?: string;
-  vcardArray?: [string, Array<[string, unknown, string, string]>];
-}
-
-interface RdapEvent {
-  eventAction?: string;
-  eventDate?: string;
-}
-
-interface RdapResponse {
-  LDHName?: string;
-  entities?: RdapEntity[];
-  status?: string[];
-  events?: RdapEvent[];
-}
-
-interface WhoisSummary {
-  domain: string;
-  registrar?: string;
-  statuses: string[];
-  createdOn?: string;
-  updatedOn?: string;
-  expiresOn?: string;
 }
 
 const RECORD_TYPES: Array<{ value: RecordType; label: string }> = [
@@ -152,85 +130,13 @@ async function resolveDnsRecords(hostname: string, recordType: RecordType): Prom
   }
 }
 
-function extractRegistrar(entity?: RdapEntity): string | undefined {
-  if (!entity) {
-    return undefined;
-  }
-
-  if (entity.objectName) {
-    return entity.objectName;
-  }
-
-  const vcard = entity.vcardArray?.[1];
-  if (!vcard) {
-    return undefined;
-  }
-
-  const match = vcard.find((entry) => entry[0] === "fn" || entry[0] === "org");
-  return match ? (match[3] as string) : undefined;
-}
-
-function findEventDate(events: RdapEvent[] | undefined, actions: string[]): string | undefined {
-  if (!events) {
-    return undefined;
-  }
-
-  for (const action of actions) {
-    const match = events.find((event) => event.eventAction?.toLowerCase() === action);
-    if (match?.eventDate) {
-      return match.eventDate;
-    }
-  }
-
-  return undefined;
-}
-
-async function fetchWhoisSummary(hostname: string): Promise<WhoisSummary> {
-  const response = await fetch(`https://rdap.org/domain/${encodeURIComponent(hostname)}`, {
-    cache: "no-store",
-  });
-
-  if (!response.ok) {
-    throw new Error(`WHOIS lookup responded with status ${response.status}`);
-  }
-
-  const payload = (await response.json()) as RdapResponse;
-
-  const registrarEntity = payload.entities?.find((entity) => entity.roles?.includes("registrar"));
-  const registrar = extractRegistrar(registrarEntity);
-
-  const createdOn = findEventDate(payload.events, ["registration", "domain registration"]);
-  const updatedOn = findEventDate(payload.events, ["last update of rdap database", "last update"]);
-  const expiresOn = findEventDate(payload.events, ["expiration", "expiration date"]);
-
-  return {
-    domain: (payload.LDHName ?? hostname).toLowerCase(),
-    registrar,
-    statuses: payload.status ?? [],
-    createdOn,
-    updatedOn,
-    expiresOn,
-  };
-}
-
-function formatTimestamp(value?: string): string {
-  if (!value) {
-    return "—";
-  }
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-  return date.toLocaleString();
-}
-
 export function DnsTool(): JSX.Element {
   const [hostname, setHostname] = useState<string>("example.com");
   const [recordType, setRecordType] = useState<RecordType>("A");
   const [records, setRecords] = useState<DnsRecord[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const [whois, setWhois] = useState<WhoisSummary | null>(null);
+  const [whois, setWhois] = useState<WhoisDomainSummary | null>(null);
   const [whoisLoading, setWhoisLoading] = useState<boolean>(false);
   const [whoisError, setWhoisError] = useState<string>("");
 
@@ -256,7 +162,7 @@ export function DnsTool(): JSX.Element {
 
     const [dnsResult, whoisResult] = await Promise.allSettled([
       resolveDnsRecords(trimmedHost, recordType),
-      fetchWhoisSummary(trimmedHost),
+      fetchDomainWhois(trimmedHost),
     ]);
 
     if (dnsResult.status === "fulfilled") {
@@ -353,17 +259,17 @@ export function DnsTool(): JSX.Element {
           </ul>
         )}
 
-        <section className="dns-whois">
+        <section className="whois-card">
           <header>
             <h3>WHOIS snapshot</h3>
             <p>Domain registration highlights sourced from the public RDAP registry.</p>
           </header>
-          {whoisLoading && <p className="dns-whois-status">Loading WHOIS details…</p>}
+          {whoisLoading && <p className="whois-card-status">Loading WHOIS details…</p>}
           {whoisError && !whoisLoading && (
-            <p className="dns-whois-status dns-whois-status--error">{whoisError}</p>
+            <p className="whois-card-status whois-card-status--error">{whoisError}</p>
           )}
           {whois && !whoisLoading && (
-            <dl className="dns-whois-details">
+            <dl className="whois-card-details">
               <div>
                 <dt>Domain</dt>
                 <dd>{whois.domain}</dd>
@@ -385,11 +291,11 @@ export function DnsTool(): JSX.Element {
                 <dd>{formatTimestamp(whois.expiresOn)}</dd>
               </div>
               {whois.statuses.length > 0 && (
-                <div className="dns-whois-statuses">
+                <div className="whois-card-statuses">
                   <dt>Status</dt>
                   <dd>
                     {whois.statuses.map((status) => (
-                      <span key={status} className="dns-whois-status-pill">
+                      <span key={status} className="whois-card-status-pill">
                         {status}
                       </span>
                     ))}

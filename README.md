@@ -1,6 +1,6 @@
 # plumber
 
-Plumber is a TypeScript + React playground for quick networking diagnostics directly in the browser. The experience will continue to expand into IP intelligence, CIDR math, DNS insights, ownership discovery, and connectivity checks—without any backend services required.
+plumber is a simple web-based toolkit for performing common networking checks and diagnostics in one place.
 
 ## Quick start
 
@@ -23,6 +23,16 @@ To produce an optimized build:
 ```bash
 npm run build
 npm run preview
+```
+
+### Deploying to GitHub Pages
+
+This repository ships with a GitHub Actions workflow (`.github/workflows/deploy.yml`) that builds the Vite site and publishes the contents of `dist/` to GitHub Pages. Push to `main` (or trigger the workflow manually) to update the hosted site.
+
+The workflow sets `GITHUB_PAGES=true` during the build so Vite emits assets with the `/plumber/` base path required for Pages. If you run `npm run build` locally for Pages, export the same variable first:
+
+```bash
+GITHUB_PAGES=true npm run build
 ```
 
 ## Architecture highlights

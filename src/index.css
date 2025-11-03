@@ -488,7 +488,7 @@ a {
   text-align: center;
 }
 
-.dns-whois {
+.whois-card {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.25rem;
@@ -498,50 +498,57 @@ a {
   gap: 0.85rem;
 }
 
-.dns-whois header h3 {
+.whois-card header h3 {
   margin: 0;
   font-size: 1.2rem;
 }
 
-.dns-whois header p {
+.whois-card header p {
   margin: 0.35rem 0 0;
   color: var(--muted);
 }
 
-.dns-whois-status {
+.whois-card-form {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) auto;
+  gap: 1rem;
+  align-items: end;
+}
+
+.whois-card-status {
   margin: 0;
   font-size: 0.9rem;
   color: var(--muted);
 }
 
-.dns-whois-status--error {
+.whois-card-status--error {
   color: var(--error);
 }
 
-.dns-whois-details {
+.whois-card-details {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 0.75rem 1.5rem;
   margin: 0;
 }
 
-.dns-whois-details dt {
+.whois-card-details dt {
   font-weight: 600;
   color: var(--muted);
 }
 
-.dns-whois-details dd {
+.whois-card-details dd {
   margin: 0.25rem 0 0;
   word-break: break-word;
 }
 
-.dns-whois-statuses dd {
+.whois-card-statuses dd {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
 }
 
-.dns-whois-status-pill {
+.whois-card-status-pill {
   display: inline-flex;
   align-items: center;
   padding: 0.2rem 0.6rem;
@@ -601,6 +608,14 @@ a {
 
   .theme-select {
     align-self: flex-start;
+  }
+
+  .whois-card-details {
+    grid-template-columns: 1fr;
+  }
+
+  .whois-card-form {
+    grid-template-columns: 1fr;
   }
 }
 
