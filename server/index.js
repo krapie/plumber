@@ -17,10 +17,13 @@ function isCurlRequest(req) {
   return (req.headers['user-agent'] || '').toLowerCase().startsWith('curl')
 }
 
-// Root: curl → plain text IP, browser → SPA
+// Root: curl → plain text IP, browser on HTTP → HTTPS redirect, browser on HTTPS → SPA
 app.get('/', (req, res) => {
   if (isCurlRequest(req)) {
     return res.type('text/plain').send(getClientIp(req) + '\n')
+  }
+  if (req.headers['x-forwarded-proto'] === 'http') {
+    return res.redirect(301, `https://${req.headers.host}${req.url}`)
   }
   res.sendFile(join(__dirname, '../dist/index.html'))
 })
