@@ -151,9 +151,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 
 /* Theme toggle */
 .theme-toggle {
-  position: fixed;
-  top: 18px;
-  right: 18px;
+  flex-shrink: 0;
   width: 32px;
   height: 32px;
   border-radius: var(--kp-radius-sm);
@@ -161,7 +159,6 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   place-items: center;
   color: var(--kp-fg-3);
   transition: background var(--kp-dur-fast) var(--kp-ease), color var(--kp-dur-fast) var(--kp-ease);
-  z-index: 10;
 }
 .theme-toggle:hover { background: var(--kp-hover-bg); color: var(--kp-fg); }
 .theme-toggle svg { width: 16px; height: 16px; }
@@ -196,6 +193,11 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   font-weight: 500;
   line-height: 1;
   transition: background var(--kp-dur-base) var(--kp-ease), color var(--kp-dur-base) var(--kp-ease);
+}
+.kp-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
 }
 .kp-header .back-link {
   font-size: var(--kp-text-xs);

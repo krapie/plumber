@@ -29,21 +29,22 @@ export default function App() {
 
   return (
     <div className="page-root">
-      <button
-        className="theme-toggle"
-        onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}
-        aria-label="toggle theme"
-        title="toggle theme"
-      >
-        {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-      </button>
-
       <header className="kp-header">
         <div className="brand">
           <span className="pi-mark">π</span>
           <span>Plumber</span>
         </div>
-        <a href="https://kevinprk.com" className="back-link">← kevinprk.com</a>
+        <div className="kp-header-right">
+          <a href="https://kevinprk.com" className="back-link">← kevinprk.com</a>
+          <button
+            className="theme-toggle"
+            onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}
+            aria-label="toggle theme"
+            title="toggle theme"
+          >
+            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+          </button>
+        </div>
       </header>
 
       <main className="kp-main">
