@@ -60,52 +60,53 @@ export default function DnsLookup() {
   const records = result ? parseRecords(result) : []
 
   return (
-    <section className="rounded-xl border border-slate-800 bg-slate-900 p-6">
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
-        DNS Lookup
-      </h2>
-
-      <form onSubmit={lookup} className="flex gap-2">
+    <div className="kp-card">
+      <form onSubmit={lookup} className="kp-input-row">
         <input
           type="text"
           value={host}
           onChange={e => setHost(e.target.value)}
           placeholder="example.com"
-          className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-sky-500 font-mono"
+          className="kp-input"
         />
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 disabled:opacity-50 text-sm font-medium transition-colors"
-        >
-          {loading ? '...' : 'Lookup'}
+        <button type="submit" disabled={loading} className="btn-primary">
+          {loading ? 'Looking up…' : 'Look up'}
         </button>
       </form>
 
-      {error && (
-        <p className="mt-4 text-red-400 text-sm">{error}</p>
-      )}
+      {error && <p className="kp-error">{error}</p>}
 
       {result && records.length === 0 && (
-        <p className="mt-4 text-slate-500 text-sm">No records found for {result.host}</p>
+        <p className="kp-empty">no records found for {result.host}</p>
       )}
 
-      {records.length > 0 && (
-        <div className="mt-4 space-y-3">
-          {records.map(r => (
-            <div key={r.type}>
-              <span className="text-xs font-semibold text-sky-500 uppercase tracking-wider">{r.type}</span>
-              <div className="mt-1 space-y-1">
-                {r.values.map((v, i) => (
-                  <p key={i} className="font-mono text-sm text-slate-300 bg-slate-800 rounded px-3 py-1.5">
-                    {v}
-                  </p>
-                ))}
-              </div>
+      {result && records.length > 0 && (
+        <div className="kp-output">
+          <div className="kp-output-row">
+            <div className="key">domain</div>
+            <div className="val">{result.host}</div>
+          </div>
+          <div className="kp-output-row">
+            <div className="key">status</div>
+            <div className="val">
+              <span className="kp-badge"><span className="dot" />resolved</span>
             </div>
+          </div>
+          <div className="kp-output-divider" />
+          {records.map(r => (
+            r.values.map((v, i) => (
+              <div className="kp-output-row" key={`${r.type}-${i}`}>
+                <div className="key">{i === 0 ? r.type : ''}</div>
+                <div className="val">{v}</div>
+              </div>
+            ))
           ))}
         </div>
       )}
-    </section>
+
+      {!result && !loading && !error && (
+        <p className="kp-empty">enter a domain to look up</p>
+      )}
+    </div>
   )
 }

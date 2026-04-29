@@ -20,26 +20,24 @@ export default function IpCheck() {
   }
 
   return (
-    <section className="rounded-xl border border-slate-800 bg-slate-900 p-6">
-      <h2 className="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-4">
-        Your IP
-      </h2>
-
+    <div className="kp-card">
       {error ? (
-        <p className="text-red-400 text-sm">Failed to fetch IP</p>
+        <p className="kp-error">failed to fetch IP address</p>
       ) : ip === null ? (
-        <div className="h-10 w-48 rounded bg-slate-800 animate-pulse" />
+        <div className="kp-skeleton" />
       ) : (
-        <div className="flex items-center gap-4">
-          <span className="text-3xl font-mono font-semibold text-sky-300">{ip}</span>
-          <button
-            onClick={copy}
-            className="text-xs px-3 py-1.5 rounded-lg border border-slate-700 text-slate-400 hover:border-sky-500 hover:text-sky-400 transition-colors"
-          >
-            {copied ? 'Copied!' : 'Copy'}
-          </button>
+        <div className="kp-output">
+          <div className="kp-output-row">
+            <div className="key">address</div>
+            <div className="val kp-ip-value" style={{ fontSize: 'var(--kp-text-md)' }}>{ip}</div>
+          </div>
         </div>
       )}
-    </section>
+      {ip && (
+        <button className="btn-secondary" style={{ alignSelf: 'flex-start' }} onClick={copy}>
+          {copied ? 'Copied' : 'Copy'}
+        </button>
+      )}
+    </div>
   )
 }
