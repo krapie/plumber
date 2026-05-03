@@ -167,6 +167,9 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  max-width: var(--kp-content-width);
+  margin: 0 auto;
+  padding: 0 var(--kp-page-pad);
 }
 
 /* Theme toggle */
@@ -188,10 +191,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--kp-space-5) var(--kp-page-pad);
-  max-width: var(--kp-content-width);
-  width: 100%;
-  margin: 0 auto;
+  padding: var(--kp-space-5) 0;
 }
 .kp-header .brand {
   display: flex;
@@ -231,10 +231,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 
 /* Main content */
 .kp-main {
-  max-width: var(--kp-content-width);
-  margin: 0 auto;
-  width: 100%;
-  padding: var(--kp-space-7) var(--kp-page-pad) var(--kp-space-9);
+  padding: var(--kp-space-7) 0 var(--kp-space-9);
   flex: 1;
 }
 .kp-main h1 {
@@ -436,10 +433,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 
 /* Footer */
 .kp-footer {
-  max-width: var(--kp-content-width);
-  margin: 0 auto;
-  width: 100%;
-  padding: var(--kp-space-6) var(--kp-page-pad);
+  padding: var(--kp-space-6) 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
