@@ -433,6 +433,15 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   text-align: center;
 }
 
+/* DNS rcode */
+.dns-rcode-error {
+  font-family: var(--kp-font-mono);
+  font-size: var(--kp-text-xs);
+  font-weight: var(--kp-weight-semi);
+  letter-spacing: var(--kp-tracking-mono);
+  color: #a01b1b;
+}
+
 /* WHOIS section */
 .whois-heading {
   font-size: var(--kp-text-xs);

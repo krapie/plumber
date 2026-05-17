@@ -4,6 +4,7 @@ type DnsRecord = { type: string; values: string[] }
 
 interface DnsResult {
   host: string
+  rcode: string
   records: Record<string, unknown>
   errors: Record<string, string>
 }
@@ -42,6 +43,13 @@ function formatDate(raw: string): string {
   const d = new Date(raw)
   if (isNaN(d.getTime())) return raw
   return d.toISOString().slice(0, 10)
+}
+
+function RcodeBadge({ rcode }: { rcode: string }) {
+  if (rcode === 'NOERROR') {
+    return <span className="kp-badge"><span className="dot" />NOERROR</span>
+  }
+  return <span className="dns-rcode-error">{rcode}</span>
 }
 
 export default function DnsLookup() {
@@ -114,11 +122,7 @@ export default function DnsLookup() {
 
       {error && <p className="kp-error">{error}</p>}
 
-      {result && records.length === 0 && (
-        <p className="kp-empty">no records found for {result.host}</p>
-      )}
-
-      {result && records.length > 0 && (
+      {result && (
         <div className="kp-output">
           <div className="kp-output-row">
             <div className="key">domain</div>
@@ -127,18 +131,23 @@ export default function DnsLookup() {
           <div className="kp-output-row">
             <div className="key">status</div>
             <div className="val">
-              <span className="kp-badge"><span className="dot" />NoError</span>
+              <RcodeBadge rcode={result.rcode} />
             </div>
           </div>
-          <div className="kp-output-divider" />
-          {records.map(r => (
-            r.values.map((v, i) => (
-              <div className="kp-output-row" key={`${r.type}-${i}`}>
-                <div className="key">{i === 0 ? r.type : ''}</div>
-                <div className="val">{v}</div>
-              </div>
-            ))
-          ))}
+
+          {records.length > 0 && (
+            <>
+              <div className="kp-output-divider" />
+              {records.map(r =>
+                r.values.map((v, i) => (
+                  <div className="kp-output-row" key={`${r.type}-${i}`}>
+                    <div className="key">{i === 0 ? r.type : ''}</div>
+                    <div className="val">{v}</div>
+                  </div>
+                ))
+              )}
+            </>
+          )}
 
           {/* WHOIS section */}
           {(whoisLoading || hasWhois) && (

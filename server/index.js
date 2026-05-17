@@ -51,7 +51,12 @@ app.get('/api/dns', async (req, res) => {
     resolveMx(host).then(r => (records.MX = r)).catch(e => (errors.MX = e.code)),
   ])
 
-  res.json({ host, records, errors })
+  const errorCodes = Object.values(errors)
+  let rcode = 'NOERROR'
+  if (errorCodes.some(c => c === 'ESERVFAIL')) rcode = 'SERVFAIL'
+  else if (errorCodes.length === 4 && errorCodes.every(c => c === 'ENOTFOUND')) rcode = 'NXDOMAIN'
+
+  res.json({ host, records, errors, rcode })
 })
 
 // API: BGP / ASN lookup via Team Cymru whois
