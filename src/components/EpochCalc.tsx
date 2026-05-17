@@ -51,9 +51,9 @@ function epochToUtc(raw: string): { utc: string; iso: string; relative: string; 
   return { utc, iso: date.toISOString(), relative: formatRelative(date), ms }
 }
 
-function utcToEpoch(local: string): { seconds: number; millis: number } | null {
-  if (!local) return null
-  const date = new Date(local + 'Z')
+function utcToEpoch(raw: string): { seconds: number; millis: number } | null {
+  if (!raw.trim()) return null
+  const date = new Date(raw.trim())
   if (isNaN(date.getTime())) return null
   const ms = date.getTime()
   return { seconds: Math.floor(ms / 1000), millis: ms }
@@ -151,13 +151,17 @@ export default function EpochCalc() {
           <div className="epoch-section-label">UTC → epoch</div>
           <div className="kp-input-row">
             <input
-              type="datetime-local"
+              type="text"
               value={utcInput}
               onChange={e => setUtcInput(e.target.value)}
-              className="kp-input"
-              step="1"
+              placeholder="2024-11-14T12:00:00Z"
+              className={'kp-input' + (utcInput && !utcResult ? ' kp-input-error' : '')}
             />
           </div>
+
+          {utcInput && !utcResult && (
+            <p className="kp-error">invalid UTC date — try 2024-11-14T12:00:00Z</p>
+          )}
 
           {utcResult ? (
             <div className="kp-output">
@@ -165,7 +169,7 @@ export default function EpochCalc() {
               <OutputRow label="millis" value={String(utcResult.millis)} />
             </div>
           ) : (
-            <p className="kp-empty">pick a UTC date and time</p>
+            <p className="kp-empty">enter a UTC datetime string</p>
           )}
         </div>
       </div>
