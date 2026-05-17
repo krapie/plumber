@@ -59,57 +59,22 @@ export default function App() {
         <p className="subtitle">a small network toolbox. look up DNS records, check your IP, convert epoch timestamps, calculate CIDRs.</p>
 
         <div className="kp-tabs">
-          <button
-            className={'kp-tab' + (tab === 'ip' ? ' active' : '')}
-            onClick={() => setTab('ip')}
-          >
-            IP
-          </button>
-          <button
-            className={'kp-tab' + (tab === 'dns' ? ' active' : '')}
-            onClick={() => setTab('dns')}
-          >
-            DNS
-          </button>
-          <button
-            className={'kp-tab' + (tab === 'epoch' ? ' active' : '')}
-            onClick={() => setTab('epoch')}
-          >
-            Epoch
-          </button>
-          <button
-            className={'kp-tab' + (tab === 'cidr' ? ' active' : '')}
-            onClick={() => setTab('cidr')}
-          >
-            CIDR
-          </button>
-          <button
-            className={'kp-tab' + (tab === 'prop' ? ' active' : '')}
-            onClick={() => setTab('prop')}
-          >
-            Propagation
-          </button>
-          <button
-            className={'kp-tab' + (tab === 'bgp' ? ' active' : '')}
-            onClick={() => setTab('bgp')}
-          >
-            BGP
-          </button>
-          <button
-            className={'kp-tab' + (tab === 'tls' ? ' active' : '')}
-            onClick={() => setTab('tls')}
-          >
-            TLS
-          </button>
+          <button className={'kp-tab' + (tab === 'ip'   ? ' active' : '')} onClick={() => setTab('ip')}>IP</button>
+          <button className={'kp-tab' + (tab === 'cidr' ? ' active' : '')} onClick={() => setTab('cidr')}>CIDR</button>
+          <button className={'kp-tab' + (tab === 'bgp'  ? ' active' : '')} onClick={() => setTab('bgp')}>BGP</button>
+          <button className={'kp-tab' + (tab === 'tls'  ? ' active' : '')} onClick={() => setTab('tls')}>TLS</button>
+          <button className={'kp-tab' + (tab === 'dns'  ? ' active' : '')} onClick={() => setTab('dns')}>DNS</button>
+          <button className={'kp-tab' + (tab === 'prop' ? ' active' : '')} onClick={() => setTab('prop')}>Propagation</button>
+          <button className={'kp-tab' + (tab === 'epoch'? ' active' : '')} onClick={() => setTab('epoch')}>Epoch</button>
         </div>
 
-        {tab === 'ip' && <IpCheck />}
-        {tab === 'dns' && <DnsLookup />}
+        {tab === 'ip'    && <IpCheck />}
+        {tab === 'cidr'  && <CidrCalc />}
+        {tab === 'bgp'   && <BgpLookup />}
+        {tab === 'tls'   && <TlsChecker />}
+        {tab === 'dns'   && <DnsLookup />}
+        {tab === 'prop'  && <Propagation />}
         {tab === 'epoch' && <EpochCalc />}
-        {tab === 'cidr' && <CidrCalc />}
-        {tab === 'prop' && <Propagation />}
-        {tab === 'bgp' && <BgpLookup />}
-        {tab === 'tls' && <TlsChecker />}
       </main>
 
       <footer className="kp-footer">
