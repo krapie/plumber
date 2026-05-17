@@ -2,6 +2,7 @@ import express from 'express'
 import { resolve4, resolve6, resolveMx, resolveCname } from 'dns/promises'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
+import whoiser from 'whoiser'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -49,6 +50,44 @@ app.get('/api/dns', async (req, res) => {
   ])
 
   res.json({ host, records, errors })
+})
+
+// API: WHOIS lookup
+app.get('/api/whois', async (req, res) => {
+  const host = req.query.host?.trim()
+  if (!host) return res.status(400).json({ error: 'host is required' })
+
+  try {
+    const raw = await whoiser(host, { timeout: 8000, follow: 2 })
+
+    // whoiser returns an object keyed by whois server; pick the first populated one
+    const data = Object.values(raw).find(v => typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length > 1) || {}
+
+    function pick(obj, keys) {
+      for (const k of keys) {
+        const val = obj[k]
+        if (val !== undefined && val !== '' && !(Array.isArray(val) && val.length === 0)) return val
+      }
+      return null
+    }
+
+    const rawStatus = pick(data, ['Domain Status', 'status', 'Status'])
+    const statusList = (Array.isArray(rawStatus) ? rawStatus : rawStatus ? [rawStatus] : [])
+      .map(s => s.split(' ')[0].trim())
+      .filter(Boolean)
+
+    const result = {
+      status: statusList,
+      registrar: pick(data, ['Registrar', 'registrar', 'Sponsoring Registrar']) || null,
+      created:   pick(data, ['Creation Date', 'Created Date', 'created', 'Registration Time']) || null,
+      expires:   pick(data, ['Registry Expiry Date', 'Expiry Date', 'expires', 'Expiration Time', 'Registrar Registration Expiration Date']) || null,
+      registrant: pick(data, ['Registrant Organization', 'Registrant Name', 'registrant', 'Registrant']) || null,
+    }
+
+    res.json(result)
+  } catch (err) {
+    res.status(502).json({ error: 'whois lookup failed', detail: err.message })
+  }
 })
 
 // Static assets

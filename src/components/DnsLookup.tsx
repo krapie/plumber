@@ -8,6 +8,14 @@ interface DnsResult {
   errors: Record<string, string>
 }
 
+interface WhoisResult {
+  status: string[]
+  registrar: string | null
+  created: string | null
+  expires: string | null
+  registrant: string | null
+}
+
 function parseRecords(result: DnsResult): DnsRecord[] {
   const out: DnsRecord[] = []
   const { records } = result
@@ -30,9 +38,17 @@ function parseRecords(result: DnsResult): DnsRecord[] {
   return out
 }
 
+function formatDate(raw: string): string {
+  const d = new Date(raw)
+  if (isNaN(d.getTime())) return raw
+  return d.toISOString().slice(0, 10)
+}
+
 export default function DnsLookup() {
   const [host, setHost] = useState('')
   const [result, setResult] = useState<DnsResult | null>(null)
+  const [whois, setWhois] = useState<WhoisResult | null>(null)
+  const [whoisLoading, setWhoisLoading] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -44,20 +60,42 @@ export default function DnsLookup() {
     setLoading(true)
     setError(null)
     setResult(null)
+    setWhois(null)
+    setWhoisLoading(true)
 
-    try {
-      const res = await fetch(`/api/dns?host=${encodeURIComponent(q)}`)
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Lookup failed')
-      setResult(data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Lookup failed')
-    } finally {
-      setLoading(false)
+    const [dnsRes, whoisRes] = await Promise.allSettled([
+      fetch(`/api/dns?host=${encodeURIComponent(q)}`),
+      fetch(`/api/whois?host=${encodeURIComponent(q)}`),
+    ])
+
+    setLoading(false)
+
+    if (dnsRes.status === 'fulfilled') {
+      const r = dnsRes.value
+      try {
+        const data = await r.json()
+        if (!r.ok) setError(data.error || 'Lookup failed')
+        else setResult(data)
+      } catch {
+        setError('Lookup failed')
+      }
+    } else {
+      setError('Lookup failed')
     }
+
+    if (whoisRes.status === 'fulfilled') {
+      try {
+        const data = await whoisRes.value.json()
+        if (whoisRes.value.ok) setWhois(data)
+      } catch { /* silently ignore */ }
+    }
+    setWhoisLoading(false)
   }
 
   const records = result ? parseRecords(result) : []
+  const hasWhois = whois && (
+    whois.status.length > 0 || whois.registrar || whois.created || whois.expires || whois.registrant
+  )
 
   return (
     <div className="kp-card">
@@ -101,6 +139,60 @@ export default function DnsLookup() {
               </div>
             ))
           ))}
+
+          {/* WHOIS section */}
+          {(whoisLoading || hasWhois) && (
+            <>
+              <div className="kp-output-divider" style={{ marginTop: 'var(--kp-space-2)' }} />
+              <div className="whois-heading">whois</div>
+            </>
+          )}
+
+          {whoisLoading && (
+            <div className="kp-output-row">
+              <div className="key" />
+              <div className="val" style={{ color: 'var(--kp-fg-4)' }}>fetching…</div>
+            </div>
+          )}
+
+          {!whoisLoading && hasWhois && (
+            <>
+              {whois!.status.length > 0 && (
+                <div className="kp-output-row">
+                  <div className="key">epp</div>
+                  <div className="val whois-status-list">
+                    {whois!.status.map(s => (
+                      <span key={s} className="whois-status-tag">{s}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {whois!.registrar && (
+                <div className="kp-output-row">
+                  <div className="key">registrar</div>
+                  <div className="val">{whois!.registrar}</div>
+                </div>
+              )}
+              {whois!.registrant && (
+                <div className="kp-output-row">
+                  <div className="key">registrant</div>
+                  <div className="val">{whois!.registrant}</div>
+                </div>
+              )}
+              {whois!.created && (
+                <div className="kp-output-row">
+                  <div className="key">created</div>
+                  <div className="val">{formatDate(whois!.created)}</div>
+                </div>
+              )}
+              {whois!.expires && (
+                <div className="kp-output-row">
+                  <div className="key">expires</div>
+                  <div className="val">{formatDate(whois!.expires)}</div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
 
