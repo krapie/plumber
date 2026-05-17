@@ -2,7 +2,7 @@ import express from 'express'
 import { resolve4, resolve6, resolveMx, resolveCname } from 'dns/promises'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
-import whoiser from 'whoiser'
+import { whoisDomain } from 'whoiser'
 import Dns2 from 'dns2'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -113,7 +113,7 @@ app.get('/api/whois', async (req, res) => {
   if (!host) return res.status(400).json({ error: 'host is required' })
 
   try {
-    const raw = await whoiser(host, { timeout: 8000, follow: 2 })
+    const raw = await whoisDomain(host, { timeout: 8000, follow: 2 })
 
     // whoiser returns an object keyed by whois server; pick the first populated one
     const data = Object.values(raw).find(v => typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length > 1) || {}
