@@ -300,6 +300,8 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 }
 .kp-input:focus { border-color: var(--kp-fg); box-shadow: 0 0 0 2px var(--kp-focus-ring); }
 .kp-input::placeholder { color: var(--kp-fg-4); }
+.kp-input-error { border-color: #a01b1b; }
+.kp-input-error:focus { box-shadow: 0 0 0 2px rgba(160, 27, 27, 0.25); }
 
 /* Buttons */
 .btn-primary {
@@ -429,6 +431,14 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   font-family: var(--kp-font-mono);
   padding: var(--kp-space-4);
   text-align: center;
+}
+
+/* CIDR calculator */
+.cidr-no {
+  font-family: var(--kp-font-mono);
+  font-size: var(--kp-text-sm);
+  color: var(--kp-fg-3);
+  letter-spacing: var(--kp-tracking-mono);
 }
 
 /* Epoch calculator */

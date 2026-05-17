@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import IpCheck from './components/IpCheck'
 import DnsLookup from './components/DnsLookup'
 import EpochCalc from './components/EpochCalc'
+import CidrCalc from './components/CidrCalc'
 
 function SunIcon() {
   return (
@@ -21,7 +22,7 @@ function MoonIcon() {
 }
 
 export default function App() {
-  const [tab, setTab] = useState<'ip' | 'dns' | 'epoch'>('ip')
+  const [tab, setTab] = useState<'ip' | 'dns' | 'epoch' | 'cidr'>('ip')
   const [theme, setTheme] = useState<'light' | 'dark'>(
     () => window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   )
@@ -52,7 +53,7 @@ export default function App() {
 
       <main className="kp-main">
         <h1>Plumber</h1>
-        <p className="subtitle">a small network toolbox. look up DNS records, check your IP, convert epoch timestamps.</p>
+        <p className="subtitle">a small network toolbox. look up DNS records, check your IP, convert epoch timestamps, calculate CIDRs.</p>
 
         <div className="kp-tabs">
           <button
@@ -73,11 +74,18 @@ export default function App() {
           >
             Epoch
           </button>
+          <button
+            className={'kp-tab' + (tab === 'cidr' ? ' active' : '')}
+            onClick={() => setTab('cidr')}
+          >
+            CIDR
+          </button>
         </div>
 
         {tab === 'ip' && <IpCheck />}
         {tab === 'dns' && <DnsLookup />}
         {tab === 'epoch' && <EpochCalc />}
+        {tab === 'cidr' && <CidrCalc />}
       </main>
 
       <footer className="kp-footer">
