@@ -9,6 +9,7 @@
     "start": "node server/index.js"
   },
   "dependencies": {
+    "dns2": "^2.1.0",
     "express": "^4.21.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

@@ -3,6 +3,7 @@ import { resolve4, resolve6, resolveMx, resolveCname } from 'dns/promises'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import whoiser from 'whoiser'
+import Dns2 from 'dns2'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -50,6 +51,60 @@ app.get('/api/dns', async (req, res) => {
   ])
 
   res.json({ host, records, errors })
+})
+
+// API: DNS propagation check
+const RESOLVERS = [
+  { name: 'Google',      ip: '8.8.8.8',          region: 'US' },
+  { name: 'Cloudflare',  ip: '1.1.1.1',          region: 'Global' },
+  { name: 'OpenDNS',     ip: '208.67.222.222',    region: 'US' },
+  { name: 'Quad9',       ip: '9.9.9.9',           region: 'CH' },
+  { name: 'Verisign',    ip: '64.6.64.6',         region: 'US' },
+  { name: 'AdGuard',     ip: '94.140.14.14',      region: 'CY' },
+  { name: 'Level3',      ip: '4.2.2.1',           region: 'US' },
+  { name: 'Alibaba',     ip: '223.5.5.5',         region: 'CN' },
+  { name: 'Baidu',       ip: '180.76.76.76',      region: 'CN' },
+  { name: 'KT',          ip: '168.126.63.1',      region: 'KR' },
+  { name: 'KDDI',        ip: '203.141.128.100',   region: 'JP' },
+  { name: 'Telstra',     ip: '139.130.4.4',       region: 'AU' },
+]
+
+const SUPPORTED_TYPES = new Set(['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT'])
+
+async function queryResolver(host, type, resolverIp) {
+  const dns = new Dns2({ nameServers: [resolverIp] })
+  const result = await dns.resolve(host, type)
+  const answers = result.answers || []
+
+  return answers.map(a => {
+    if (type === 'MX') return `${a.priority} ${a.exchange}`
+    if (type === 'TXT') return Array.isArray(a.data) ? a.data.join('') : String(a.data)
+    return a.address || a.data || a.domain || ''
+  }).filter(Boolean).sort()
+}
+
+app.get('/api/propagation', async (req, res) => {
+  const host = req.query.host?.trim()
+  const type = (req.query.type || 'A').toUpperCase()
+
+  if (!host) return res.status(400).json({ error: 'host is required' })
+  if (!SUPPORTED_TYPES.has(type)) return res.status(400).json({ error: 'unsupported record type' })
+
+  const results = await Promise.allSettled(
+    RESOLVERS.map(r =>
+      Promise.race([
+        queryResolver(host, type, r.ip),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
+      ]).then(values => ({ ...r, values, error: null }))
+        .catch(err => ({ ...r, values: [], error: err.message === 'timeout' ? 'timeout' : 'error' }))
+    )
+  )
+
+  res.json({
+    host,
+    type,
+    results: results.map(r => r.value),
+  })
 })
 
 // API: WHOIS lookup

@@ -533,6 +533,144 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .epoch-copy-btn:hover { color: var(--kp-fg); background: var(--kp-hover-bg); }
 .epoch-copy-btn svg { width: 13px; height: 13px; }
 
+/* Propagation checker */
+.prop-card { max-width: 800px; }
+@media (min-width: 1024px) { .prop-card { max-width: 900px; } }
+
+.prop-type-select-wrap { position: relative; flex-shrink: 0; }
+.prop-type-select {
+  flex: none;
+  width: 90px;
+  appearance: none;
+  cursor: pointer;
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23737373' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+.prop-loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-2);
+}
+.prop-loading-bar {
+  height: 2px;
+  border-radius: 1px;
+  background: var(--kp-border);
+  position: relative;
+  overflow: hidden;
+}
+.prop-loading-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--kp-fg-3);
+  animation: prop-scan 1.4s ease-in-out infinite;
+  transform-origin: left;
+}
+@keyframes prop-scan {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+.prop-loading span {
+  font-size: var(--kp-text-xs);
+  font-family: var(--kp-font-mono);
+  color: var(--kp-fg-4);
+  letter-spacing: var(--kp-tracking-mono);
+}
+
+.prop-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
+  padding: 10px var(--kp-space-4);
+  background: var(--kp-bg-subtle);
+  border: 1px solid var(--kp-border-faint);
+  border-radius: var(--kp-radius-sm);
+  font-size: var(--kp-text-sm);
+  flex-wrap: wrap;
+}
+.prop-summary-count {
+  font-family: var(--kp-font-mono);
+  font-weight: var(--kp-weight-semi);
+  color: var(--kp-fg);
+  letter-spacing: var(--kp-tracking-mono);
+}
+.prop-summary-label { color: var(--kp-fg-3); }
+.prop-summary-value {
+  font-family: var(--kp-font-mono);
+  font-size: var(--kp-text-xs);
+  color: var(--kp-fg-2);
+  background: var(--kp-bg-muted);
+  padding: 2px 8px;
+  border-radius: var(--kp-radius-xs);
+  border: 1px solid var(--kp-border-faint);
+  letter-spacing: var(--kp-tracking-mono);
+  word-break: break-all;
+}
+
+.prop-table {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--kp-border-faint);
+  border-radius: var(--kp-radius-sm);
+  overflow: hidden;
+  font-size: var(--kp-text-sm);
+  font-family: var(--kp-font-mono);
+}
+.prop-table-header {
+  display: grid;
+  grid-template-columns: 110px 64px 1fr 24px;
+  gap: var(--kp-space-3);
+  padding: 6px var(--kp-space-4);
+  background: var(--kp-bg-muted);
+  font-size: var(--kp-text-xs);
+  color: var(--kp-fg-4);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--kp-border-faint);
+}
+.prop-table-row {
+  display: grid;
+  grid-template-columns: 110px 64px 1fr 24px;
+  gap: var(--kp-space-3);
+  padding: 7px var(--kp-space-4);
+  align-items: start;
+  border-bottom: 1px solid var(--kp-border-faint);
+  letter-spacing: var(--kp-tracking-mono);
+}
+.prop-table-row:last-child { border-bottom: none; }
+.prop-table-row.match { background: rgba(31, 122, 58, 0.03); }
+
+.prop-resolver-name { color: var(--kp-fg); font-weight: var(--kp-weight-medium); }
+.prop-region {
+  color: var(--kp-fg-4);
+  font-size: var(--kp-text-xs);
+  padding-top: 1px;
+}
+.prop-value {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.prop-val-item {
+  color: var(--kp-fg-1);
+  word-break: break-all;
+  font-size: var(--kp-text-xs);
+}
+.prop-none { color: var(--kp-fg-4); }
+.prop-error-text { color: var(--kp-fg-4); font-size: var(--kp-text-xs); }
+
+.prop-status-icon {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 1px;
+}
+.prop-icon-ok  { color: var(--kp-success); }
+.prop-icon-diff { color: var(--kp-fg-4); }
+
 /* Footer */
 .kp-footer {
   padding: var(--kp-space-6) 0;

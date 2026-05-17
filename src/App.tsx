@@ -3,6 +3,7 @@ import IpCheck from './components/IpCheck'
 import DnsLookup from './components/DnsLookup'
 import EpochCalc from './components/EpochCalc'
 import CidrCalc from './components/CidrCalc'
+import Propagation from './components/Propagation'
 
 function SunIcon() {
   return (
@@ -22,7 +23,7 @@ function MoonIcon() {
 }
 
 export default function App() {
-  const [tab, setTab] = useState<'ip' | 'dns' | 'epoch' | 'cidr'>('ip')
+  const [tab, setTab] = useState<'ip' | 'dns' | 'epoch' | 'cidr' | 'prop'>('ip')
   const [theme, setTheme] = useState<'light' | 'dark'>(
     () => window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   )
@@ -80,12 +81,19 @@ export default function App() {
           >
             CIDR
           </button>
+          <button
+            className={'kp-tab' + (tab === 'prop' ? ' active' : '')}
+            onClick={() => setTab('prop')}
+          >
+            Propagation
+          </button>
         </div>
 
         {tab === 'ip' && <IpCheck />}
         {tab === 'dns' && <DnsLookup />}
         {tab === 'epoch' && <EpochCalc />}
         {tab === 'cidr' && <CidrCalc />}
+        {tab === 'prop' && <Propagation />}
       </main>
 
       <footer className="kp-footer">
