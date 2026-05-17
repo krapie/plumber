@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { whoisDomain } from 'whoiser'
 import net from 'net'
+import tls from 'tls'
 import Dns2 from 'dns2'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -57,6 +58,68 @@ app.get('/api/dns', async (req, res) => {
   else if (errorCodes.length === 4 && errorCodes.every(c => c === 'ENOTFOUND')) rcode = 'NXDOMAIN'
 
   res.json({ host, records, errors, rcode })
+})
+
+// API: TLS checker
+app.get('/api/tls', async (req, res) => {
+  const host = req.query.host?.trim()
+  const port = parseInt(req.query.port) || 443
+  if (!host) return res.status(400).json({ error: 'host is required' })
+
+  try {
+    const result = await new Promise((resolve, reject) => {
+      const socket = tls.connect({ host, port, servername: host, rejectUnauthorized: false }, () => {
+        const cert = socket.getPeerCertificate(true)
+        const proto = socket.getProtocol()
+        const cipher = socket.getCipher()
+        const authorized = socket.authorized
+
+        if (!cert || !cert.subject) {
+          socket.destroy()
+          return reject(new Error('no certificate returned'))
+        }
+
+        const sans = cert.subjectaltname
+          ? cert.subjectaltname.split(', ').map(s => s.replace(/^DNS:/, '').trim())
+          : []
+
+        const issuerO = cert.issuer?.O || cert.issuer?.CN || null
+        const subjectCN = cert.subject?.CN || null
+        const validFrom = cert.valid_from ? new Date(cert.valid_from).toISOString() : null
+        const validTo = cert.valid_to ? new Date(cert.valid_to).toISOString() : null
+        const daysLeft = validTo
+          ? Math.floor((new Date(validTo) - Date.now()) / 86_400_000)
+          : null
+
+        // detect self-signed: issuer matches subject
+        const selfSigned = cert.issuer?.CN === cert.subject?.CN && cert.issuer?.O === cert.subject?.O
+
+        socket.destroy()
+        resolve({
+          handshake: 'success',
+          protocol: proto,
+          cipher: cipher?.name || null,
+          subject: subjectCN,
+          issuer: issuerO,
+          sans,
+          validFrom,
+          validTo,
+          daysLeft,
+          trusted: authorized ? 'trusted' : selfSigned ? 'self-signed' : 'untrusted',
+        })
+      })
+
+      socket.setTimeout(8000, () => { socket.destroy(); reject(new Error('timeout')) })
+      socket.on('error', err => reject(err))
+    })
+
+    res.json(result)
+  } catch (err) {
+    res.json({
+      handshake: 'failed',
+      error: err.message,
+    })
+  }
 })
 
 // API: BGP / ASN lookup via Team Cymru whois

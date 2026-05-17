@@ -433,6 +433,35 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   text-align: center;
 }
 
+/* TLS checker */
+.tls-port-input {
+  flex: none;
+  width: 72px;
+}
+.tls-expiry-row {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-2);
+}
+.tls-expiry-ok   { font-size: var(--kp-text-xs); color: var(--kp-fg-4); font-family: var(--kp-font-mono); }
+.tls-expiry-warn { font-size: var(--kp-text-xs); color: #92400e;        font-family: var(--kp-font-mono); }
+.tls-expiry-critical { font-size: var(--kp-text-xs); color: #a01b1b;   font-family: var(--kp-font-mono); }
+.tls-sans {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tls-san-tag {
+  font-size: 11px;
+  font-family: var(--kp-font-mono);
+  letter-spacing: 0;
+  padding: 1px 7px;
+  border-radius: 3px;
+  border: 1px solid var(--kp-border);
+  color: var(--kp-fg-2);
+  background: var(--kp-bg-muted);
+}
+
 /* DNS rcode */
 .dns-rcode-error {
   font-family: var(--kp-font-mono);

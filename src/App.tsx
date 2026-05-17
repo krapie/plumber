@@ -5,6 +5,7 @@ import EpochCalc from './components/EpochCalc'
 import CidrCalc from './components/CidrCalc'
 import Propagation from './components/Propagation'
 import BgpLookup from './components/BgpLookup'
+import TlsChecker from './components/TlsChecker'
 
 function SunIcon() {
   return (
@@ -24,7 +25,7 @@ function MoonIcon() {
 }
 
 export default function App() {
-  const [tab, setTab] = useState<'ip' | 'dns' | 'epoch' | 'cidr' | 'prop' | 'bgp'>('ip')
+  const [tab, setTab] = useState<'ip' | 'dns' | 'epoch' | 'cidr' | 'prop' | 'bgp' | 'tls'>('ip')
   const [theme, setTheme] = useState<'light' | 'dark'>(
     () => window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   )
@@ -94,6 +95,12 @@ export default function App() {
           >
             BGP
           </button>
+          <button
+            className={'kp-tab' + (tab === 'tls' ? ' active' : '')}
+            onClick={() => setTab('tls')}
+          >
+            TLS
+          </button>
         </div>
 
         {tab === 'ip' && <IpCheck />}
@@ -102,6 +109,7 @@ export default function App() {
         {tab === 'cidr' && <CidrCalc />}
         {tab === 'prop' && <Propagation />}
         {tab === 'bgp' && <BgpLookup />}
+        {tab === 'tls' && <TlsChecker />}
       </main>
 
       <footer className="kp-footer">
