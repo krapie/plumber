@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import IpCheck from './components/IpCheck'
 import DnsLookup from './components/DnsLookup'
+import EpochCalc from './components/EpochCalc'
 
 function SunIcon() {
   return (
@@ -20,8 +21,10 @@ function MoonIcon() {
 }
 
 export default function App() {
-  const [tab, setTab] = useState<'ip' | 'dns'>('ip')
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
+  const [tab, setTab] = useState<'ip' | 'dns' | 'epoch'>('ip')
+  const [theme, setTheme] = useState<'light' | 'dark'>(
+    () => window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  )
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -49,7 +52,7 @@ export default function App() {
 
       <main className="kp-main">
         <h1>Plumber</h1>
-        <p className="subtitle">a small network toolbox. look up DNS records, check what your IP is.</p>
+        <p className="subtitle">a small network toolbox. look up DNS records, check your IP, convert epoch timestamps.</p>
 
         <div className="kp-tabs">
           <button
@@ -64,9 +67,17 @@ export default function App() {
           >
             DNS lookup
           </button>
+          <button
+            className={'kp-tab' + (tab === 'epoch' ? ' active' : '')}
+            onClick={() => setTab('epoch')}
+          >
+            epoch
+          </button>
         </div>
 
-        {tab === 'ip' ? <IpCheck /> : <DnsLookup />}
+        {tab === 'ip' && <IpCheck />}
+        {tab === 'dns' && <DnsLookup />}
+        {tab === 'epoch' && <EpochCalc />}
       </main>
 
       <footer className="kp-footer">
