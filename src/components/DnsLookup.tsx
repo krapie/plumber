@@ -127,7 +127,7 @@ export default function DnsLookup() {
           <div className="kp-output-row">
             <div className="key">status</div>
             <div className="val">
-              <span className="kp-badge"><span className="dot" />resolved</span>
+              <span className="kp-badge"><span className="dot" />NoError</span>
             </div>
           </div>
           <div className="kp-output-divider" />
