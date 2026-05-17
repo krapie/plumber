@@ -59,19 +59,19 @@ export default function App() {
             className={'kp-tab' + (tab === 'ip' ? ' active' : '')}
             onClick={() => setTab('ip')}
           >
-            my IP
+            IP
           </button>
           <button
             className={'kp-tab' + (tab === 'dns' ? ' active' : '')}
             onClick={() => setTab('dns')}
           >
-            DNS lookup
+            DNS
           </button>
           <button
             className={'kp-tab' + (tab === 'epoch' ? ' active' : '')}
             onClick={() => setTab('epoch')}
           >
-            epoch
+            Epoch
           </button>
         </div>
 
