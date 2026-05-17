@@ -4,6 +4,7 @@ import DnsLookup from './components/DnsLookup'
 import EpochCalc from './components/EpochCalc'
 import CidrCalc from './components/CidrCalc'
 import Propagation from './components/Propagation'
+import BgpLookup from './components/BgpLookup'
 
 function SunIcon() {
   return (
@@ -23,7 +24,7 @@ function MoonIcon() {
 }
 
 export default function App() {
-  const [tab, setTab] = useState<'ip' | 'dns' | 'epoch' | 'cidr' | 'prop'>('ip')
+  const [tab, setTab] = useState<'ip' | 'dns' | 'epoch' | 'cidr' | 'prop' | 'bgp'>('ip')
   const [theme, setTheme] = useState<'light' | 'dark'>(
     () => window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   )
@@ -87,6 +88,12 @@ export default function App() {
           >
             Propagation
           </button>
+          <button
+            className={'kp-tab' + (tab === 'bgp' ? ' active' : '')}
+            onClick={() => setTab('bgp')}
+          >
+            BGP
+          </button>
         </div>
 
         {tab === 'ip' && <IpCheck />}
@@ -94,6 +101,7 @@ export default function App() {
         {tab === 'epoch' && <EpochCalc />}
         {tab === 'cidr' && <CidrCalc />}
         {tab === 'prop' && <Propagation />}
+        {tab === 'bgp' && <BgpLookup />}
       </main>
 
       <footer className="kp-footer">

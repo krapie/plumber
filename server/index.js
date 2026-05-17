@@ -3,6 +3,7 @@ import { resolve4, resolve6, resolveMx, resolveCname } from 'dns/promises'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { whoisDomain } from 'whoiser'
+import net from 'net'
 import Dns2 from 'dns2'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -51,6 +52,50 @@ app.get('/api/dns', async (req, res) => {
   ])
 
   res.json({ host, records, errors })
+})
+
+// API: BGP / ASN lookup via Team Cymru whois
+function cymruQuery(ip) {
+  return new Promise((resolve, reject) => {
+    const socket = net.createConnection(43, 'whois.cymru.com')
+    let buf = ''
+    const timer = setTimeout(() => { socket.destroy(); reject(new Error('timeout')) }, 8000)
+
+    socket.setEncoding('utf8')
+    socket.on('connect', () => socket.write(`begin\nverbose\n${ip}\nend\n`))
+    socket.on('data', chunk => { buf += chunk })
+    socket.on('end', () => {
+      clearTimeout(timer)
+      // Response has a header line then data lines: "AS | IP | BGP Prefix | CC | Registry | Allocated | AS Name"
+      const lines = buf.split('\n').map(l => l.trim()).filter(Boolean)
+      const dataLine = lines.find(l => /^\d+\s*\|/.test(l))
+      if (!dataLine) return reject(new Error('no data'))
+
+      const parts = dataLine.split('|').map(p => p.trim())
+      resolve({
+        asn:       parts[0] ? `AS${parts[0]}` : null,
+        ip:        parts[1] || null,
+        prefix:    parts[2] || null,
+        country:   parts[3] || null,
+        registry:  parts[4] || null,
+        allocated: parts[5] || null,
+        asName:    parts[6] || null,
+      })
+    })
+    socket.on('error', err => { clearTimeout(timer); reject(err) })
+  })
+}
+
+app.get('/api/bgp', async (req, res) => {
+  const ip = req.query.ip?.trim()
+  if (!ip) return res.status(400).json({ error: 'ip is required' })
+
+  try {
+    const result = await cymruQuery(ip)
+    res.json(result)
+  } catch (err) {
+    res.status(502).json({ error: 'BGP lookup failed', detail: err.message })
+  }
 })
 
 // API: DNS propagation check
