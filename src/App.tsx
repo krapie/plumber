@@ -56,7 +56,7 @@ export default function App() {
 
       <main className="kp-main">
         <h1>Plumber</h1>
-        <p className="subtitle">a small network toolbox. look up DNS records, check your IP, convert epoch timestamps, calculate CIDRs.</p>
+        <p className="subtitle">A small network toolbox. Look up DNS records, check your IP, convert epoch timestamps, calculate CIDRs.</p>
 
         <div className="kp-tabs">
           <button className={'kp-tab' + (tab === 'ip'   ? ' active' : '')} onClick={() => setTab('ip')}>IP</button>
