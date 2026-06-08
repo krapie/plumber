@@ -206,6 +206,102 @@ function serverFsmIdx(step: number): number {
   return SERVER_FSM_IDX[FRAMES[step]?.serverState] ?? 0
 }
 
+const CONNTRACK_ROWS = [
+  { proto: 'TCP', src: '10.0.0.5:58234', dst: '93.184.216.34:443', state: 'ESTABLISHED', ttl: '86390s' },
+  { proto: 'TCP', src: '10.0.0.5:58235', dst: '93.184.216.34:443', state: 'TIME_WAIT',   ttl: '117s'   },
+  { proto: 'TCP', src: '10.0.0.7:49801', dst: '172.16.0.1:22',     state: 'ESTABLISHED', ttl: '431980s'},
+  { proto: 'UDP', src: '10.0.0.5:52341', dst: '8.8.8.8:53',        state: 'UNREPLIED',   ttl: '28s'    },
+]
+
+function EduFact({ k, v }: { k: string; v: React.ReactNode }) {
+  return (
+    <div className="tcp-edu-fact">
+      <span className="tcp-edu-fact-k">{k}</span>
+      <span className="tcp-edu-fact-v">{v}</span>
+    </div>
+  )
+}
+
+function MtuMssSection() {
+  return (
+    <div className="tcp-edu-section">
+      <div className="tcp-edu-title">MTU / MSS / MRU</div>
+
+      <div className="tcp-frame-diagram">
+        <div className="tcp-frame-bar">
+          <div className="tcp-frame-seg tcp-seg-eth">
+            <span>Eth</span><span className="tcp-seg-sz">14 B</span>
+          </div>
+          <div className="tcp-frame-seg tcp-seg-ip">
+            <span>IP</span><span className="tcp-seg-sz">20 B</span>
+          </div>
+          <div className="tcp-frame-seg tcp-seg-tcp">
+            <span>TCP</span><span className="tcp-seg-sz">20 B</span>
+          </div>
+          <div className="tcp-frame-seg tcp-seg-payload">
+            <span>Payload</span><span className="tcp-seg-sz">≤ 1460 B</span>
+          </div>
+        </div>
+        <div className="tcp-frame-spans">
+          <div className="tcp-frame-span-mtu">
+            <div className="tcp-span-line" />
+            <span>MTU = 1500 B</span>
+            <div className="tcp-span-line" />
+          </div>
+          <div className="tcp-frame-span-mss">
+            <div className="tcp-span-line" />
+            <span>MSS = 1460 B</span>
+            <div className="tcp-span-line" />
+          </div>
+        </div>
+      </div>
+
+      <div className="tcp-edu-facts">
+        <EduFact k="MTU" v="Max L3 packet size per link. Ethernet default: 1500 B. Jumbo frames: up to 9000 B." />
+        <EduFact k="MSS" v={<>Max TCP payload per segment. <code>MSS = MTU − IP_hdr − TCP_hdr = 1500 − 20 − 20 = <strong>1460 B</strong></code>. Each side advertises its MSS in the SYN.</>} />
+        <EduFact k="MRU" v="Max receive unit — the largest packet the local interface will reassemble. Usually equals MTU on the same link." />
+        <EduFact k="PMTUD" v="Path MTU Discovery: sender starts at local MTU; routers with smaller MTUs reply ICMP 'Fragmentation Needed', letting the sender reduce MSS hop-by-hop." />
+      </div>
+
+      <div className="tcp-coming-soon">Interactive path MTU discovery demo — coming soon</div>
+    </div>
+  )
+}
+
+function ConntrackSection() {
+  const stateCls = (s: string) =>
+    s === 'ESTABLISHED' ? 'ct-est' : s === 'TIME_WAIT' ? 'ct-closing' : s === 'UNREPLIED' ? 'ct-unreplied' : ''
+  return (
+    <div className="tcp-edu-section">
+      <div className="tcp-edu-title">Connection Tracking (conntrack)</div>
+
+      <div className="tcp-ct-table">
+        <div className="tcp-ct-header">
+          <span>proto</span><span>source</span><span>destination</span><span>state</span><span>ttl</span>
+        </div>
+        {CONNTRACK_ROWS.map((r, i) => (
+          <div key={i} className="tcp-ct-row">
+            <span className="tcp-ct-proto">{r.proto}</span>
+            <span className="tcp-ct-addr">{r.src}</span>
+            <span className="tcp-ct-addr">{r.dst}</span>
+            <span className={`tcp-ct-state ${stateCls(r.state)}`}>{r.state}</span>
+            <span className="tcp-ct-ttl">{r.ttl}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="tcp-edu-facts">
+        <EduFact k="NEW"         v="First packet seen; no reply yet. Firewall can accept or drop before state is established." />
+        <EduFact k="ESTABLISHED" v="Bidirectional traffic confirmed. Timeout: TCP 5 days, UDP 3 min. Most firewall rules allow this by default." />
+        <EduFact k="RELATED"     v="New flow spawned by an existing tracked one — e.g., FTP data channel opened by the FTP control connection." />
+        <EduFact k="TIME_WAIT"   v="Connection closed; entry lingers 120 s to absorb delayed or duplicate packets still in flight." />
+      </div>
+
+      <div className="tcp-coming-soon">Live conntrack table viewer — coming soon</div>
+    </div>
+  )
+}
+
 const PHASE_LABEL: Record<Phase, string> = {
   handshake: 'Handshake',
   data: 'Data Transfer',
@@ -425,6 +521,9 @@ export default function TcpExplorer() {
           <span className="tcp-step-counter">{step + 1} / {FRAMES.length}</span>
         </div>
       )}
+
+      <MtuMssSection />
+      <ConntrackSection />
     </div>
   )
 }

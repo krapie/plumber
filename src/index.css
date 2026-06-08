@@ -1087,6 +1087,187 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .tcp-flag-rst { color: #a01b1b; border-color: rgba(160,27,27,.35); background: rgba(160,27,27,.07); }
 .tcp-flag-urg { color: var(--kp-fg-3); border-color: var(--kp-border); background: var(--kp-bg-muted); }
 
+/* ─── DNS sub-tabs ─────────────────────────────────── */
+
+.kp-subtabs {
+  display: flex;
+  gap: 2px;
+  margin-bottom: var(--kp-space-4);
+}
+.kp-subtab {
+  font: 500 var(--kp-text-xs) var(--kp-font-sans);
+  padding: 5px 12px;
+  border-radius: var(--kp-radius-sm);
+  border: 1px solid var(--kp-border);
+  color: var(--kp-fg-3);
+  background: transparent;
+  transition: color var(--kp-dur-fast) var(--kp-ease), background var(--kp-dur-fast) var(--kp-ease), border-color var(--kp-dur-fast) var(--kp-ease);
+}
+.kp-subtab:hover { color: var(--kp-fg-1); background: var(--kp-hover-bg); }
+.kp-subtab.active { color: var(--kp-fg); background: var(--kp-bg-muted); border-color: var(--kp-border-strong); }
+
+/* ─── TCP edu sections (MTU/MSS, Conntrack) ────────── */
+
+.tcp-edu-section {
+  border: 1px solid var(--kp-border);
+  border-radius: var(--kp-radius-md);
+  overflow: hidden;
+  background: var(--kp-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tcp-edu-title {
+  padding: 7px var(--kp-space-4);
+  background: var(--kp-bg-muted);
+  border-bottom: 1px solid var(--kp-border-faint);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kp-fg-4);
+}
+
+/* MTU/MSS frame diagram */
+.tcp-frame-diagram {
+  padding: var(--kp-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-bottom: 1px solid var(--kp-border-faint);
+}
+
+.tcp-frame-bar {
+  display: flex;
+  height: 52px;
+  border-radius: var(--kp-radius-xs);
+  border: 1px solid var(--kp-border);
+  overflow: hidden;
+  font-family: var(--kp-font-mono);
+  font-size: 10px;
+}
+.tcp-frame-seg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px 6px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border-right: 1px solid var(--kp-border);
+  transition: background var(--kp-dur-base) var(--kp-ease);
+}
+.tcp-frame-seg:last-child { border-right: none; }
+.tcp-seg-sz { font-weight: 400; color: var(--kp-fg-3); font-size: 9px; }
+
+.tcp-seg-eth     { flex: 0 0 56px; background: var(--kp-bg-muted); color: var(--kp-fg-3); }
+.tcp-seg-ip      { flex: 0 0 60px; background: var(--kp-bg-subtle); color: var(--kp-fg-2); }
+.tcp-seg-tcp     { flex: 0 0 60px; background: var(--kp-bg-subtle); color: var(--kp-fg-2); }
+.tcp-seg-payload { flex: 1;        background: var(--kp-bg);        color: var(--kp-fg); }
+
+/* MTU / MSS span annotations */
+.tcp-frame-spans {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 56px; /* skip Eth column */
+}
+.tcp-frame-span-mtu,
+.tcp-frame-span-mss {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-family: var(--kp-font-mono);
+  color: var(--kp-fg-3);
+  height: 14px;
+}
+.tcp-frame-span-mss { padding-left: 120px; /* skip IP+TCP */ }
+.tcp-span-line {
+  flex: 1;
+  height: 1px;
+  background: var(--kp-border-strong);
+}
+
+/* Edu facts list */
+.tcp-edu-facts {
+  padding: var(--kp-space-3) var(--kp-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-bottom: 1px solid var(--kp-border-faint);
+}
+.tcp-edu-fact {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: var(--kp-space-3);
+  font-size: var(--kp-text-sm);
+  line-height: var(--kp-leading-normal);
+}
+.tcp-edu-fact-k {
+  font-family: var(--kp-font-mono);
+  font-size: var(--kp-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--kp-fg-3);
+  padding-top: 2px;
+}
+.tcp-edu-fact-v { color: var(--kp-fg-2); }
+.tcp-edu-fact-v code {
+  font-family: var(--kp-font-mono);
+  font-size: var(--kp-text-xs);
+  background: var(--kp-bg-muted);
+  padding: 1px 4px;
+  border-radius: 2px;
+  letter-spacing: var(--kp-tracking-mono);
+}
+
+/* Coming soon note */
+.tcp-coming-soon {
+  padding: var(--kp-space-3) var(--kp-space-4);
+  font-size: var(--kp-text-xs);
+  font-family: var(--kp-font-mono);
+  color: var(--kp-fg-4);
+  letter-spacing: var(--kp-tracking-mono);
+}
+
+/* Conntrack table */
+.tcp-ct-table {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--kp-border-faint);
+  font-family: var(--kp-font-mono);
+  font-size: var(--kp-text-xs);
+  overflow-x: auto;
+}
+.tcp-ct-header,
+.tcp-ct-row {
+  display: grid;
+  grid-template-columns: 44px 158px 158px 100px 60px;
+  gap: var(--kp-space-3);
+  padding: 5px var(--kp-space-4);
+  letter-spacing: var(--kp-tracking-mono);
+}
+.tcp-ct-header {
+  background: var(--kp-bg-muted);
+  border-bottom: 1px solid var(--kp-border-faint);
+  color: var(--kp-fg-4);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.tcp-ct-row { border-bottom: 1px solid var(--kp-border-faint); }
+.tcp-ct-row:last-child { border-bottom: none; }
+.tcp-ct-proto { color: var(--kp-fg-3); }
+.tcp-ct-addr  { color: var(--kp-fg-2); }
+.tcp-ct-ttl   { color: var(--kp-fg-4); }
+.tcp-ct-state { font-weight: 600; }
+.ct-est       { color: #1f7a3a; }
+.ct-closing   { color: #92400e; }
+.ct-unreplied { color: var(--kp-fg-3); }
+
 /* ─── TCP FSM Panel ────────────────────────────────── */
 
 .tcp-fsm {
