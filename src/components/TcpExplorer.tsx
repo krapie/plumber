@@ -2,6 +2,81 @@ import { useState, useEffect, useRef } from 'react'
 
 type Dir = 'c2s' | 's2c'
 type Phase = 'handshake' | 'data' | 'teardown'
+type FsmItem = { kind: 'state'; name: string } | { kind: 'edge'; trigger: string }
+
+const CLIENT_FSM: FsmItem[] = [
+  { kind: 'state', name: 'CLOSED' },
+  { kind: 'edge', trigger: 'active open · send SYN' },
+  { kind: 'state', name: 'SYN_SENT' },
+  { kind: 'edge', trigger: 'recv SYN-ACK · send ACK' },
+  { kind: 'state', name: 'ESTABLISHED' },
+  { kind: 'edge', trigger: 'close · send FIN' },
+  { kind: 'state', name: 'FIN_WAIT_1' },
+  { kind: 'edge', trigger: 'recv ACK' },
+  { kind: 'state', name: 'FIN_WAIT_2' },
+  { kind: 'edge', trigger: 'recv FIN · send ACK' },
+  { kind: 'state', name: 'TIME_WAIT' },
+  { kind: 'edge', trigger: '2×MSL timeout' },
+  { kind: 'state', name: 'CLOSED' },
+]
+
+const SERVER_FSM: FsmItem[] = [
+  { kind: 'state', name: 'LISTEN' },
+  { kind: 'edge', trigger: 'recv SYN · send SYN-ACK' },
+  { kind: 'state', name: 'SYN_RCVD' },
+  { kind: 'edge', trigger: 'recv ACK' },
+  { kind: 'state', name: 'ESTABLISHED' },
+  { kind: 'edge', trigger: 'recv FIN · send ACK' },
+  { kind: 'state', name: 'CLOSE_WAIT' },
+  { kind: 'edge', trigger: 'close · send FIN' },
+  { kind: 'state', name: 'LAST_ACK' },
+  { kind: 'edge', trigger: 'recv ACK' },
+  { kind: 'state', name: 'CLOSED' },
+]
+
+const CLIENT_FSM_IDX: Record<string, number> = {
+  CLOSED: 0, SYN_SENT: 1, ESTABLISHED: 2, FIN_WAIT_1: 3, FIN_WAIT_2: 4, TIME_WAIT: 5,
+}
+const SERVER_FSM_IDX: Record<string, number> = {
+  LISTEN: 0, SYN_RCVD: 1, ESTABLISHED: 2, CLOSE_WAIT: 3, LAST_ACK: 4, CLOSED: 5,
+}
+
+const FSM_STATE_COLOR: Record<string, string> = {
+  ESTABLISHED: 'fsm-color-est',
+  FIN_WAIT_1: 'fsm-color-closing', FIN_WAIT_2: 'fsm-color-closing',
+  TIME_WAIT: 'fsm-color-closing', CLOSE_WAIT: 'fsm-color-closing', LAST_ACK: 'fsm-color-closing',
+}
+
+function FsmColumn({ items, curIdx, title }: { items: FsmItem[]; curIdx: number; title: string }) {
+  return (
+    <div className="tcp-fsm-col">
+      <div className="tcp-fsm-col-title">{title}</div>
+      {items.map((item, i) => {
+        if (item.kind === 'state') {
+          const idx = i / 2
+          const status: 'past' | 'current' | 'future' =
+            idx < curIdx ? 'past' : idx === curIdx ? 'current' : 'future'
+          const colorCls = status === 'current' ? (FSM_STATE_COLOR[item.name] ?? '') : ''
+          return (
+            <div key={i} className={`tcp-fsm-node fsm-${status} ${colorCls}`}>
+              <div className="tcp-fsm-node-dot" />
+              <span className="tcp-fsm-node-name">{item.name}</span>
+            </div>
+          )
+        } else {
+          const prevIdx = (i - 1) / 2
+          const done = prevIdx < curIdx
+          return (
+            <div key={i} className={`tcp-fsm-edge ${done ? 'fsm-past' : 'fsm-future'}`}>
+              <div className="tcp-fsm-edge-track" />
+              <span className="tcp-fsm-edge-label">{item.trigger}</span>
+            </div>
+          )
+        }
+      })}
+    </div>
+  )
+}
 
 interface Packet {
   dir: Dir
@@ -121,6 +196,15 @@ const FRAMES: Frame[] = [
     annotation: 'Connection closed (after 2×MSL)'
   },
 ]
+
+function clientFsmIdx(step: number): number {
+  const s = FRAMES[step]?.clientState
+  if (s === 'CLOSED' && step > 0) return 6
+  return CLIENT_FSM_IDX[s] ?? 0
+}
+function serverFsmIdx(step: number): number {
+  return SERVER_FSM_IDX[FRAMES[step]?.serverState] ?? 0
+}
 
 const PHASE_LABEL: Record<Phase, string> = {
   handshake: 'Handshake',
@@ -262,6 +346,16 @@ export default function TcpExplorer() {
           )}
 
           <div className="tcp-seq-pad" />
+        </div>
+      </div>
+
+      {/* TCP State Machine */}
+      <div className="tcp-fsm">
+        <div className="tcp-fsm-header">TCP State Machine</div>
+        <div className="tcp-fsm-body">
+          <FsmColumn items={CLIENT_FSM} curIdx={clientFsmIdx(step)} title="Client" />
+          <div className="tcp-fsm-divider" />
+          <FsmColumn items={SERVER_FSM} curIdx={serverFsmIdx(step)} title="Server" />
         </div>
       </div>
 

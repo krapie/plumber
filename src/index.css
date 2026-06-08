@@ -1086,3 +1086,126 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .tcp-flag-psh { color: var(--kp-fg-2); border-color: var(--kp-border-strong); background: var(--kp-bg-muted); }
 .tcp-flag-rst { color: #a01b1b; border-color: rgba(160,27,27,.35); background: rgba(160,27,27,.07); }
 .tcp-flag-urg { color: var(--kp-fg-3); border-color: var(--kp-border); background: var(--kp-bg-muted); }
+
+/* ─── TCP FSM Panel ────────────────────────────────── */
+
+.tcp-fsm {
+  border: 1px solid var(--kp-border);
+  border-radius: var(--kp-radius-md);
+  overflow: hidden;
+  background: var(--kp-surface);
+}
+
+.tcp-fsm-header {
+  padding: 7px var(--kp-space-4);
+  background: var(--kp-bg-muted);
+  border-bottom: 1px solid var(--kp-border-faint);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kp-fg-4);
+}
+
+.tcp-fsm-body {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+}
+
+.tcp-fsm-divider { background: var(--kp-border-faint); }
+
+.tcp-fsm-col {
+  padding: var(--kp-space-4) var(--kp-space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.tcp-fsm-col-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--kp-fg-4);
+  margin-bottom: var(--kp-space-3);
+}
+
+/* State node */
+.tcp-fsm-node {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 3px 6px;
+  border-radius: var(--kp-radius-xs);
+  transition: opacity var(--kp-dur-base) var(--kp-ease), background var(--kp-dur-base) var(--kp-ease), color var(--kp-dur-base) var(--kp-ease);
+  color: var(--kp-fg-3);
+  margin-left: -6px;
+}
+.tcp-fsm-node.fsm-past   { opacity: 0.5; }
+.tcp-fsm-node.fsm-current {
+  opacity: 1;
+  color: var(--kp-fg);
+  background: var(--kp-bg-muted);
+}
+.tcp-fsm-node.fsm-future  { opacity: 0.2; }
+
+/* Per-state colors (current only) */
+.tcp-fsm-node.fsm-current.fsm-color-est     { color: #1f7a3a; background: rgba(31,122,58,.07); }
+.tcp-fsm-node.fsm-current.fsm-color-closing { color: #92400e; background: rgba(146,64,14,.07); }
+
+.tcp-fsm-node-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  flex-shrink: 0;
+  transition: background var(--kp-dur-base) var(--kp-ease);
+}
+.tcp-fsm-node.fsm-past .tcp-fsm-node-dot,
+.tcp-fsm-node.fsm-current .tcp-fsm-node-dot { background: currentColor; }
+
+.tcp-fsm-node-name {
+  font-family: var(--kp-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+@media (min-width: 480px) { .tcp-fsm-node-name { font-size: 12px; } }
+
+/* Edge (transition arrow between states) */
+.tcp-fsm-edge {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  padding: 1px 0;
+  transition: opacity var(--kp-dur-base) var(--kp-ease);
+  /* left-align track with dot center: dot is at 6px offset + 9px/2 = ~10.5px;
+     track column is 9px wide, centered = 4.5px from edge, so offset by 4.5px */
+  padding-left: 4px;
+}
+.tcp-fsm-edge.fsm-past   { opacity: 0.35; }
+.tcp-fsm-edge.fsm-future { opacity: 0.15; }
+
+.tcp-fsm-edge-track {
+  width: 9px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-self: stretch;
+}
+.tcp-fsm-edge-track::before {
+  content: '';
+  width: 1px;
+  min-height: 18px;
+  background: var(--kp-fg-3);
+  display: block;
+  opacity: 0.4;
+}
+
+.tcp-fsm-edge-label {
+  font-size: 10px;
+  font-family: var(--kp-font-mono);
+  color: var(--kp-fg-3);
+  line-height: 1.5;
+  padding-top: 1px;
+  letter-spacing: var(--kp-tracking-mono);
+}
