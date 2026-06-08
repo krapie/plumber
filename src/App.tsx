@@ -6,6 +6,7 @@ import CidrCalc from './components/CidrCalc'
 import Propagation from './components/Propagation'
 import BgpLookup from './components/BgpLookup'
 import TlsChecker from './components/TlsChecker'
+import TcpExplorer from './components/TcpExplorer'
 
 function SunIcon() {
   return (
@@ -25,7 +26,7 @@ function MoonIcon() {
 }
 
 export default function App() {
-  const [tab, setTab] = useState<'ip' | 'dns' | 'epoch' | 'cidr' | 'prop' | 'bgp' | 'tls'>('ip')
+  const [tab, setTab] = useState<'ip' | 'dns' | 'epoch' | 'cidr' | 'prop' | 'bgp' | 'tls' | 'tcp'>('ip')
   const [theme, setTheme] = useState<'light' | 'dark'>(
     () => window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   )
@@ -66,6 +67,7 @@ export default function App() {
           <button className={'kp-tab' + (tab === 'dns'  ? ' active' : '')} onClick={() => setTab('dns')}>DNS</button>
           <button className={'kp-tab' + (tab === 'prop' ? ' active' : '')} onClick={() => setTab('prop')}>Propagation</button>
           <button className={'kp-tab' + (tab === 'epoch'? ' active' : '')} onClick={() => setTab('epoch')}>Epoch</button>
+          <button className={'kp-tab' + (tab === 'tcp'  ? ' active' : '')} onClick={() => setTab('tcp')}>TCP</button>
         </div>
 
         {tab === 'ip'    && <IpCheck />}
@@ -75,6 +77,7 @@ export default function App() {
         {tab === 'dns'   && <DnsLookup />}
         {tab === 'prop'  && <Propagation />}
         {tab === 'epoch' && <EpochCalc />}
+        {tab === 'tcp'   && <TcpExplorer />}
       </main>
 
       <footer className="kp-footer">

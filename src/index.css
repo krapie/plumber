@@ -725,3 +725,364 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   font-size: 14px;
   color: var(--kp-fg-2);
 }
+
+/* ─── TCP Explorer ─────────────────────────────────── */
+
+/* entity column width — drives lifeline & arrow positioning */
+:root { --tcp-ew: 108px; }
+@media (max-width: 480px) { :root { --tcp-ew: 72px; } }
+
+.tcp-root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-4);
+  max-width: 720px;
+}
+
+/* Phase pills */
+.tcp-phases {
+  display: flex;
+  gap: var(--kp-space-2);
+  flex-wrap: wrap;
+}
+.tcp-phase-pill {
+  font-size: 11px;
+  font-family: var(--kp-font-mono);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 3px;
+  border: 1px solid var(--kp-border);
+  color: var(--kp-fg-4);
+  background: transparent;
+  transition: color var(--kp-dur-fast) var(--kp-ease), border-color var(--kp-dur-fast) var(--kp-ease), background var(--kp-dur-fast) var(--kp-ease);
+}
+.tcp-phase-pill.active {
+  color: var(--kp-fg);
+  border-color: var(--kp-border-strong);
+  background: var(--kp-bg-muted);
+}
+
+/* Diagram card */
+.tcp-diagram {
+  border: 1px solid var(--kp-border);
+  border-radius: var(--kp-radius-md);
+  overflow: hidden;
+  background: var(--kp-surface);
+}
+
+/* Entity header row */
+.tcp-entity-row {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--kp-space-3) 0;
+  border-bottom: 1px solid var(--kp-border-faint);
+  background: var(--kp-bg-muted);
+}
+.tcp-entity {
+  width: var(--tcp-ew);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.tcp-entity-name {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--kp-fg-3);
+}
+
+/* State badges */
+.tcp-state-badge {
+  font-size: 9px;
+  font-family: var(--kp-font-mono);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid;
+  white-space: nowrap;
+  transition: color var(--kp-dur-base) var(--kp-ease), background var(--kp-dur-base) var(--kp-ease), border-color var(--kp-dur-base) var(--kp-ease);
+}
+@media (min-width: 480px) { .tcp-state-badge { font-size: 10px; } }
+.tcp-st-est     { color: #1f7a3a; border-color: rgba(31,122,58,.3); background: rgba(31,122,58,.06); }
+.tcp-st-listen  { color: var(--kp-fg-2); border-color: var(--kp-border); background: var(--kp-bg-muted); }
+.tcp-st-closing { color: #92400e; border-color: rgba(146,64,14,.3); background: rgba(146,64,14,.06); }
+.tcp-st-closed  { color: var(--kp-fg-4); border-color: var(--kp-border-faint); background: transparent; }
+.tcp-st-neutral { color: var(--kp-fg-3); border-color: var(--kp-border-faint); background: transparent; }
+
+/* Scrollable sequence body */
+.tcp-seq-body {
+  position: relative;
+  overflow-y: auto;
+  max-height: 340px;
+  scroll-behavior: smooth;
+}
+
+/* Lifelines */
+.tcp-lifeline {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: var(--kp-border-strong);
+  pointer-events: none;
+}
+.tcp-lifeline-l { left: calc(var(--tcp-ew) / 2); }
+.tcp-lifeline-r { right: calc(var(--tcp-ew) / 2); }
+
+/* Packet rows */
+.tcp-pkt-row {
+  position: relative;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  transition: opacity var(--kp-dur-base) var(--kp-ease);
+}
+.tcp-pkt-row.past { opacity: 0.45; }
+.tcp-pkt-row.live { opacity: 1; }
+
+/* Arrow container — spans between lifelines */
+.tcp-arrow {
+  position: absolute;
+  left: calc(var(--tcp-ew) / 2);
+  right: calc(var(--tcp-ew) / 2);
+  height: 36px;
+  display: flex;
+  align-items: center;
+  color: var(--kp-fg-3);
+}
+.tcp-pkt-row.live .tcp-arrow { color: var(--kp-fg); }
+
+/* Horizontal line */
+.tcp-arrow-line {
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  height: 1px;
+  background: currentColor;
+}
+
+/* Arrowheads */
+.tcp-arrow-head {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0; height: 0;
+}
+.tcp-arrow.c2s .tcp-arrow-head {
+  right: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 8px solid currentColor;
+}
+.tcp-arrow.s2c .tcp-arrow-head {
+  left: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 8px solid currentColor;
+}
+
+/* Label (centered, covers the line) */
+.tcp-arrow-label {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--kp-surface);
+  padding: 0 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
+}
+.tcp-pkt-name {
+  font-family: var(--kp-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: inherit;
+}
+.tcp-pkt-meta {
+  font-family: var(--kp-font-mono);
+  font-size: 10px;
+  color: var(--kp-fg-4);
+  letter-spacing: var(--kp-tracking-mono);
+}
+.tcp-pkt-row.live .tcp-pkt-meta { color: var(--kp-fg-3); }
+
+/* Traveling dot */
+.tcp-arrow-dot {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--kp-fg);
+  z-index: 2;
+  pointer-events: none;
+}
+.tcp-arrow.c2s.animating .tcp-arrow-dot {
+  left: 0;
+  animation: tcp-ltr var(--travel, 750ms) ease-in-out forwards;
+}
+.tcp-arrow.s2c.animating .tcp-arrow-dot {
+  right: 0;
+  animation: tcp-rtl var(--travel, 750ms) ease-in-out forwards;
+}
+@keyframes tcp-ltr {
+  from { left: 0; }
+  to   { left: calc(100% - 9px); }
+}
+@keyframes tcp-rtl {
+  from { right: 0; }
+  to   { right: calc(100% - 9px); }
+}
+
+/* Annotation label inside the sequence body */
+.tcp-annotation {
+  text-align: center;
+  font-size: 11px;
+  font-family: var(--kp-font-mono);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--kp-fg-4);
+  padding: var(--kp-space-3) 0 var(--kp-space-2);
+}
+.tcp-annotation:not(:first-child) { border-top: 1px dashed var(--kp-border-faint); margin-top: var(--kp-space-2); }
+.tcp-seq-pad { height: var(--kp-space-3); }
+
+/* Controls row */
+.tcp-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-3);
+  flex-wrap: wrap;
+}
+.tcp-speed-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--kp-space-2);
+  margin-left: auto;
+  font-size: var(--kp-text-xs);
+  color: var(--kp-fg-3);
+}
+.tcp-speed-wrap input[type=range] { width: 80px; accent-color: var(--kp-fg); }
+.tcp-speed-val { font-family: var(--kp-font-mono); color: var(--kp-fg-2); min-width: 28px; }
+
+/* Progress bar */
+.tcp-progress {
+  height: 2px;
+  background: var(--kp-border-faint);
+  border-radius: 1px;
+  overflow: hidden;
+}
+.tcp-progress-fill {
+  height: 100%;
+  background: var(--kp-fg-3);
+  border-radius: 1px;
+  transition: width var(--kp-dur-base) var(--kp-ease);
+}
+
+/* Detail panel */
+.tcp-detail {
+  border: 1px solid var(--kp-border-faint);
+  border-radius: var(--kp-radius-sm);
+  padding: var(--kp-space-4);
+  background: var(--kp-bg-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--kp-space-3);
+}
+.tcp-detail-ann {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--kp-font-mono);
+  font-size: var(--kp-text-sm);
+  color: var(--kp-fg-2);
+  min-height: 44px;
+}
+.tcp-step-counter {
+  font-size: var(--kp-text-xs);
+  color: var(--kp-fg-4);
+}
+.tcp-detail-top {
+  display: flex;
+  gap: var(--kp-space-4);
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.tcp-detail-flags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  min-width: 100px;
+}
+.tcp-detail-fields {
+  display: flex;
+  gap: var(--kp-space-4);
+  flex-wrap: wrap;
+  font-family: var(--kp-font-mono);
+  font-size: var(--kp-text-sm);
+}
+.tcp-df { display: flex; gap: 6px; align-items: baseline; }
+.tcp-df .k { color: var(--kp-fg-4); font-size: var(--kp-text-xs); }
+.tcp-df .v { color: var(--kp-fg); font-weight: 500; }
+
+.tcp-detail-payload {
+  display: flex;
+  gap: var(--kp-space-2);
+  align-items: baseline;
+  background: var(--kp-bg-muted);
+  border: 1px solid var(--kp-border-faint);
+  border-radius: var(--kp-radius-xs);
+  padding: 6px 10px;
+}
+.tcp-detail-payload-label {
+  font-size: var(--kp-text-xs);
+  color: var(--kp-fg-4);
+  font-family: var(--kp-font-mono);
+  flex-shrink: 0;
+}
+.tcp-detail-payload-val {
+  font-family: var(--kp-font-mono);
+  font-size: var(--kp-text-xs);
+  color: var(--kp-fg-1);
+  letter-spacing: var(--kp-tracking-mono);
+  word-break: break-all;
+}
+
+.tcp-detail-note {
+  font-size: var(--kp-text-sm);
+  color: var(--kp-fg-2);
+  line-height: var(--kp-leading-normal);
+  border-top: 1px solid var(--kp-border-faint);
+  padding-top: var(--kp-space-3);
+  margin-top: 0;
+}
+
+/* TCP flag badges */
+.tcp-flag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-family: var(--kp-font-mono);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border: 1px solid;
+}
+.tcp-flag-syn { color: #1f7a3a; border-color: rgba(31,122,58,.35); background: rgba(31,122,58,.07); }
+.tcp-flag-ack { color: var(--kp-fg-2); border-color: var(--kp-border); background: var(--kp-bg-muted); }
+.tcp-flag-fin { color: #92400e; border-color: rgba(146,64,14,.35); background: rgba(146,64,14,.07); }
+.tcp-flag-psh { color: var(--kp-fg-2); border-color: var(--kp-border-strong); background: var(--kp-bg-muted); }
+.tcp-flag-rst { color: #a01b1b; border-color: rgba(160,27,27,.35); background: rgba(160,27,27,.07); }
+.tcp-flag-urg { color: var(--kp-fg-3); border-color: var(--kp-border); background: var(--kp-bg-muted); }
