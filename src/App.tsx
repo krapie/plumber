@@ -63,11 +63,11 @@ export default function App() {
           <button className={'kp-tab' + (tab === 'ip'   ? ' active' : '')} onClick={() => setTab('ip')}>IP</button>
           <button className={'kp-tab' + (tab === 'cidr' ? ' active' : '')} onClick={() => setTab('cidr')}>CIDR</button>
           <button className={'kp-tab' + (tab === 'bgp'  ? ' active' : '')} onClick={() => setTab('bgp')}>BGP</button>
+          <button className={'kp-tab' + (tab === 'tcp'  ? ' active' : '')} onClick={() => setTab('tcp')}>TCP</button>
           <button className={'kp-tab' + (tab === 'tls'  ? ' active' : '')} onClick={() => setTab('tls')}>TLS</button>
           <button className={'kp-tab' + (tab === 'dns'  ? ' active' : '')} onClick={() => setTab('dns')}>DNS</button>
           <button className={'kp-tab' + (tab === 'prop' ? ' active' : '')} onClick={() => setTab('prop')}>Propagation</button>
           <button className={'kp-tab' + (tab === 'epoch'? ' active' : '')} onClick={() => setTab('epoch')}>Epoch</button>
-          <button className={'kp-tab' + (tab === 'tcp'  ? ' active' : '')} onClick={() => setTab('tcp')}>TCP</button>
         </div>
 
         {tab === 'ip'    && <IpCheck />}
