@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import IndexPage from './pages/IndexPage'
+import ToolPage from './pages/ToolPage'
 import IpCheck from './components/IpCheck'
 import DnsSection from './components/DnsSection'
 import EpochCalc from './components/EpochCalc'
@@ -7,26 +10,14 @@ import BgpLookup from './components/BgpLookup'
 import TlsChecker from './components/TlsChecker'
 import TcpExplorer from './components/TcpExplorer'
 
-function SunIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <circle cx="12" cy="12" r="4" />
-      <path strokeLinecap="round" d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.06 1.06M17.34 17.34l1.06 1.06M5.6 18.4l1.06-1.06M17.34 6.66l1.06-1.06" />
-    </svg>
-  )
-}
+type Theme = 'light' | 'dark'
 
-function MoonIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
-    </svg>
-  )
-}
+interface ThemeCtx { theme: Theme; toggle: () => void }
+export const ThemeContext = createContext<ThemeCtx>({ theme: 'light', toggle: () => {} })
+export const useTheme = () => useContext(ThemeContext)
 
 export default function App() {
-  const [tab, setTab] = useState<'ip' | 'dns' | 'epoch' | 'cidr' | 'bgp' | 'tls' | 'tcp'>('ip')
-  const [theme, setTheme] = useState<'light' | 'dark'>(
+  const [theme, setTheme] = useState<Theme>(
     () => window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   )
 
@@ -34,53 +25,51 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
 
+  const toggle = () => setTheme(t => t === 'light' ? 'dark' : 'light')
+
   return (
-    <div className="page-root">
-      <header className="kp-header">
-        <div className="brand">
-          <span className="pi-mark">π</span>
-          <span>Plumber</span>
-        </div>
-        <div className="kp-header-right">
-          <a href="https://kevinprk.com" className="back-link">← kevinprk.com</a>
-          <button
-            className="theme-toggle"
-            onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}
-            aria-label="toggle theme"
-            title="toggle theme"
-          >
-            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-          </button>
-        </div>
-      </header>
-
-      <main className="kp-main">
-        <h1>Plumber</h1>
-        <p className="subtitle">A small network toolbox. Look up DNS records, check your IP, convert epoch timestamps, calculate CIDRs.</p>
-
-        <div className="kp-tabs">
-          <button className={'kp-tab' + (tab === 'ip'   ? ' active' : '')} onClick={() => setTab('ip')}>IP</button>
-          <button className={'kp-tab' + (tab === 'cidr' ? ' active' : '')} onClick={() => setTab('cidr')}>CIDR</button>
-          <button className={'kp-tab' + (tab === 'bgp'  ? ' active' : '')} onClick={() => setTab('bgp')}>BGP</button>
-          <button className={'kp-tab' + (tab === 'tcp'  ? ' active' : '')} onClick={() => setTab('tcp')}>TCP</button>
-          <button className={'kp-tab' + (tab === 'tls'  ? ' active' : '')} onClick={() => setTab('tls')}>TLS</button>
-          <button className={'kp-tab' + (tab === 'dns'  ? ' active' : '')} onClick={() => setTab('dns')}>DNS</button>
-          <button className={'kp-tab' + (tab === 'epoch'? ' active' : '')} onClick={() => setTab('epoch')}>Epoch</button>
-        </div>
-
-        {tab === 'ip'    && <IpCheck />}
-        {tab === 'cidr'  && <CidrCalc />}
-        {tab === 'bgp'   && <BgpLookup />}
-        {tab === 'tls'   && <TlsChecker />}
-        {tab === 'dns'   && <DnsSection />}
-        {tab === 'epoch' && <EpochCalc />}
-        {tab === 'tcp'   && <TcpExplorer />}
-      </main>
-
-      <footer className="kp-footer">
-        <code style={{ fontFamily: 'var(--kp-font-mono)' }}>curl plumber.kevinprk.com — returns your IP as plain text</code>
-        <span className="pi" title="3.14">π</span>
-      </footer>
-    </div>
+    <ThemeContext.Provider value={{ theme, toggle }}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<IndexPage />} />
+          <Route path="/ip" element={
+            <ToolPage title="IP Checker" subtitle="Your public IP address and network information.">
+              <IpCheck />
+            </ToolPage>
+          } />
+          <Route path="/cidr" element={
+            <ToolPage title="CIDR" subtitle="Break down a subnet into network range, host count, and masks.">
+              <CidrCalc />
+            </ToolPage>
+          } />
+          <Route path="/bgp" element={
+            <ToolPage title="BGP" subtitle="Look up the ASN, prefix, registry, and allocation for any IP.">
+              <BgpLookup />
+            </ToolPage>
+          } />
+          <Route path="/tcp" element={
+            <ToolPage title="TCP" subtitle="Step through the TCP handshake and teardown, packet by packet.">
+              <TcpExplorer />
+            </ToolPage>
+          } />
+          <Route path="/tls" element={
+            <ToolPage title="TLS" subtitle="Inspect TLS certificates, cipher suites, and trust chains.">
+              <TlsChecker />
+            </ToolPage>
+          } />
+          <Route path="/dns" element={
+            <ToolPage title="DNS" subtitle="Query DNS records and check propagation across global resolvers.">
+              <DnsSection />
+            </ToolPage>
+          } />
+          <Route path="/epoch" element={
+            <ToolPage title="Epoch" subtitle="Convert Unix timestamps to human-readable dates and back.">
+              <EpochCalc />
+            </ToolPage>
+          } />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeContext.Provider>
   )
 }
