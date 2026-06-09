@@ -11,6 +11,23 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const app = express()
 const PORT = process.env.PORT || 3000
 
+const sendUmamiEvent = (name) => {
+  const url = process.env.UMAMI_URL
+  const websiteId = process.env.UMAMI_WEBSITE_ID
+  if (!url || !websiteId) return
+  fetch(`${url}/api/send`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    },
+    body: JSON.stringify({
+      type: 'event',
+      payload: { website: websiteId, hostname: 'kevinprk.com', language: 'en', url: '/events', name },
+    }),
+  }).catch(() => {})
+}
+
 function getClientIp(req) {
   const forwarded = req.headers['x-forwarded-for']
   if (forwarded) return forwarded.split(',')[0].trim()
@@ -57,6 +74,7 @@ app.get('/api/dns', async (req, res) => {
   if (errorCodes.some(c => c === 'ESERVFAIL')) rcode = 'SERVFAIL'
   else if (errorCodes.length === 4 && errorCodes.every(c => c === 'ENOTFOUND')) rcode = 'NXDOMAIN'
 
+  sendUmamiEvent('dns_lookup')
   res.json({ host, records, errors, rcode })
 })
 
@@ -113,6 +131,7 @@ app.get('/api/tls', async (req, res) => {
       socket.on('error', err => reject(err))
     })
 
+    sendUmamiEvent('tls_check')
     res.json(result)
   } catch (err) {
     res.json({
@@ -160,6 +179,7 @@ app.get('/api/bgp', async (req, res) => {
 
   try {
     const result = await cymruQuery(ip)
+    sendUmamiEvent('bgp_lookup')
     res.json(result)
   } catch (err) {
     res.status(502).json({ error: 'BGP lookup failed', detail: err.message })
@@ -213,6 +233,7 @@ app.get('/api/propagation', async (req, res) => {
     )
   )
 
+  sendUmamiEvent('propagation_check')
   res.json({
     host,
     type,
@@ -226,6 +247,7 @@ app.get('/api/whois', async (req, res) => {
   if (!host) return res.status(400).json({ error: 'host is required' })
 
   try {
+    sendUmamiEvent('whois_lookup')
     const raw = await whoisDomain(host, { timeout: 8000, follow: 2 })
 
     // whoiser returns an object keyed by whois server; pick the first populated one
