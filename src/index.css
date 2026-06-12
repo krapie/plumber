@@ -791,6 +791,26 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .prop-icon-ok  { color: var(--kp-success); }
 .prop-icon-diff { color: var(--kp-fg-4); }
 
+/* DNS sub-tabs */
+.kp-subtabs {
+  display: flex;
+  gap: var(--kp-space-1);
+  margin-bottom: var(--kp-space-5);
+  border-bottom: 1px solid var(--kp-border);
+  padding-bottom: 0;
+}
+.kp-subtab {
+  padding: var(--kp-space-2) var(--kp-space-4);
+  font-size: var(--kp-text-sm);
+  font-weight: var(--kp-weight-medium);
+  color: var(--kp-fg-2);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color var(--kp-dur-fast) var(--kp-ease), border-color var(--kp-dur-fast) var(--kp-ease);
+}
+.kp-subtab:hover { color: var(--kp-fg); }
+.kp-subtab.active { color: var(--kp-fg); border-bottom-color: var(--kp-fg); }
+
 /* Footer */
 .kp-footer {
   padding: var(--kp-space-6) 0;
