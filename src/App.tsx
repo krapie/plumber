@@ -8,7 +8,6 @@ import EpochCalc from './components/EpochCalc'
 import CidrCalc from './components/CidrCalc'
 import BgpLookup from './components/BgpLookup'
 import TlsChecker from './components/TlsChecker'
-import TcpExplorer from './components/TcpExplorer'
 
 type Theme = 'light' | 'dark'
 
@@ -45,11 +44,6 @@ export default function App() {
           <Route path="/bgp" element={
             <ToolPage title="BGP" subtitle="Look up the ASN, prefix, registry, and allocation for any IP.">
               <BgpLookup />
-            </ToolPage>
-          } />
-          <Route path="/tcp" element={
-            <ToolPage title="TCP" subtitle="Step through the TCP handshake and teardown, packet by packet.">
-              <TcpExplorer />
             </ToolPage>
           } />
           <Route path="/tls" element={
