@@ -356,7 +356,6 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   display: flex;
   flex-direction: column;
   gap: var(--kp-space-4);
-  max-width: 600px;
 }
 
 /* Input row */
@@ -602,7 +601,6 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   background: var(--kp-bg-subtle);
   border: 1px solid var(--kp-border-faint);
   border-radius: var(--kp-radius-sm);
-  max-width: 600px;
 }
 .epoch-now-label {
   color: var(--kp-fg-4);
@@ -648,7 +646,7 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .epoch-copy-btn svg { width: 13px; height: 13px; }
 
 /* Propagation checker */
-.prop-card { max-width: 760px; }
+.prop-card { width: 100%; }
 
 .prop-type-select-wrap { position: relative; flex-shrink: 0; }
 .prop-type-select {
