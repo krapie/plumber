@@ -886,9 +886,24 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   .kp-main {
     padding: var(--kp-space-5) var(--kp-page-pad-mobile) var(--kp-space-7);
   }
+  .kp-main h1 { font-size: var(--kp-text-xl); }
 
+  .kp-card { padding: var(--kp-space-4); }
+
+  /* Stack input rows vertically so inputs don't overflow */
+  .kp-input-row { flex-direction: column; }
+  .kp-input { min-width: 0; }
+  .tls-port-input { width: 100%; flex: auto; }
+
+  /* Hide the curl hint in the footer — too long for mobile */
+  .kp-footer code { display: none; }
   .kp-footer {
     padding: var(--kp-space-4) var(--kp-page-pad-mobile);
   }
+
+  /* Propagation table — scroll rather than overflow */
+  .prop-table { overflow-x: auto; }
+  .prop-table-header,
+  .prop-table-row { min-width: 360px; }
 }
 
