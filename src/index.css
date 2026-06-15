@@ -820,3 +820,69 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   color: var(--kp-fg-2);
 }
 
+/* ==========================================================================
+   RESPONSIVE — mobile
+   ========================================================================== */
+@media (max-width: 768px) {
+  .kp-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .kp-tool-rail {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    padding: var(--kp-space-2) var(--kp-space-3);
+    border-right: none;
+    border-bottom: 1px solid var(--kp-border);
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 2px;
+  }
+
+  .kp-tool-rail-brand { display: none; }
+
+  .kp-tool-rail-nav {
+    flex-direction: row;
+    flex: 1;
+    gap: 2px;
+  }
+
+  .kp-tool-rail-item {
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 10px;
+    font-size: 11px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .kp-tool-rail-footer {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+    border-left: 1px solid var(--kp-border-faint);
+    padding-left: var(--kp-space-2);
+    flex-shrink: 0;
+    gap: 0;
+  }
+
+  .kp-tool-rail-back { display: none; }
+
+  .kp-shell-main { min-height: auto; }
+
+  .kp-main {
+    padding: var(--kp-space-5) var(--kp-page-pad-mobile) var(--kp-space-7);
+  }
+
+  .kp-footer {
+    padding: var(--kp-space-4) var(--kp-page-pad-mobile);
+  }
+}
+
