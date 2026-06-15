@@ -278,6 +278,8 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
 .kp-tool-rail-item:hover .kp-tool-rail-icon { color: var(--kp-fg-3); }
 .kp-tool-rail-item.active .kp-tool-rail-icon { color: var(--kp-fg-2); }
 
+.kp-rail-short { display: none; }
+
 .kp-tool-rail-footer {
   margin-top: auto;
   padding-top: var(--kp-space-3);
@@ -852,14 +854,18 @@ button { font: inherit; cursor: pointer; background: none; border: none; color: 
   }
 
   .kp-tool-rail-item {
+    flex: 1;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 3px;
-    padding: 6px 10px;
+    padding: 6px 4px;
     font-size: 11px;
     white-space: nowrap;
-    flex-shrink: 0;
   }
+
+  .kp-rail-label { display: none; }
+  .kp-rail-short { display: inline; }
 
   .kp-tool-rail-footer {
     flex-direction: row;
