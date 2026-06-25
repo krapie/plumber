@@ -59,6 +59,46 @@ function utcToEpoch(raw: string): { seconds: number; millis: number } | null {
   return { seconds: Math.floor(ms / 1000), millis: ms }
 }
 
+function utcToPacific(raw: string): { pacific: string; abbr: string } | null {
+  if (!raw.trim()) return null
+  const date = new Date(raw.trim())
+  if (isNaN(date.getTime())) return null
+
+  const fmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Los_Angeles',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false,
+    timeZoneName: 'short',
+  })
+
+  const parts = fmt.formatToParts(date)
+  const get = (t: string) => parts.find(p => p.type === t)?.value ?? ''
+  const pacific = `${get('year')}-${get('month')}-${get('day')} ${get('hour')}:${get('minute')}:${get('second')}`
+  const abbr = get('timeZoneName')
+  return { pacific, abbr }
+}
+
+function kstToUtc(raw: string): { utc: string; iso: string; seconds: number; millis: number } | null {
+  const trimmed = raw.trim()
+  if (!trimmed) return null
+
+  // Accept "YYYY-MM-DD HH:MM:SS" or ISO-like; treat input as KST (UTC+9)
+  const normalized = trimmed.replace(' ', 'T')
+  const withOffset = normalized.endsWith('Z') || /[+-]\d{2}:?\d{2}$/.test(normalized)
+    ? normalized
+    : normalized + '+09:00'
+
+  const date = new Date(withOffset)
+  if (isNaN(date.getTime())) return null
+
+  const ms = date.getTime()
+  const pad = (v: number) => String(v).padStart(2, '0')
+  const utc = `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())} ${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())} UTC`
+
+  return { utc, iso: date.toISOString(), seconds: Math.floor(ms / 1000), millis: ms }
+}
+
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false)
   function copy() {
@@ -99,8 +139,13 @@ export default function EpochCalc() {
     return () => clearInterval(id)
   }, [])
 
+  const [pacificInput, setPacificInput] = useState('')
+  const [kstInput, setKstInput] = useState('')
+
   const epochResult = epochToUtc(epochInput)
   const utcResult = utcToEpoch(utcInput)
+  const pacificResult = utcToPacific(pacificInput)
+  const kstResult = kstToUtc(kstInput)
 
   const currentEpoch = Math.floor(now / 1000)
 
@@ -170,6 +215,62 @@ export default function EpochCalc() {
             </div>
           ) : (
             <p className="kp-empty">enter a UTC datetime string</p>
+          )}
+        </div>
+
+        {/* UTC → PDT/PST */}
+        <div className="kp-card">
+          <div className="epoch-section-label">UTC → PDT / PST</div>
+          <div className="kp-input-row">
+            <input
+              type="text"
+              value={pacificInput}
+              onChange={e => setPacificInput(e.target.value)}
+              placeholder="2024-11-14T12:00:00Z"
+              className={'kp-input' + (pacificInput && !pacificResult ? ' kp-input-error' : '')}
+            />
+          </div>
+
+          {pacificInput && !pacificResult && (
+            <p className="kp-error">invalid UTC date — try 2024-11-14T12:00:00Z</p>
+          )}
+
+          {pacificResult ? (
+            <div className="kp-output">
+              <OutputRow label={pacificResult.abbr} value={pacificResult.pacific} />
+            </div>
+          ) : (
+            <p className="kp-empty">enter a UTC datetime string</p>
+          )}
+        </div>
+
+        {/* KST → UTC */}
+        <div className="kp-card">
+          <div className="epoch-section-label">KST → UTC</div>
+          <div className="kp-input-row">
+            <input
+              type="text"
+              value={kstInput}
+              onChange={e => setKstInput(e.target.value)}
+              placeholder="2024-11-14 21:00:00"
+              className={'kp-input' + (kstInput && !kstResult ? ' kp-input-error' : '')}
+            />
+          </div>
+
+          {kstInput && !kstResult && (
+            <p className="kp-error">invalid KST date — try 2024-11-14 21:00:00</p>
+          )}
+
+          {kstResult ? (
+            <div className="kp-output">
+              <OutputRow label="UTC" value={kstResult.utc} />
+              <OutputRow label="ISO" value={kstResult.iso} />
+              <div className="kp-output-divider" />
+              <OutputRow label="seconds" value={String(kstResult.seconds)} />
+              <OutputRow label="millis" value={String(kstResult.millis)} />
+            </div>
+          ) : (
+            <p className="kp-empty">enter a KST datetime string</p>
           )}
         </div>
       </div>
