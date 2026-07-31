@@ -187,19 +187,22 @@ app.get('/api/bgp', async (req, res) => {
 })
 
 // API: DNS propagation check
+// lat/lon are an approximate representative location (provider HQ or primary POP) —
+// most of these are anycast networks that actually answer from whichever point of
+// presence is nearest the resolver, not from this single location.
 const RESOLVERS = [
-  { name: 'Google',      ip: '8.8.8.8',          region: 'US' },
-  { name: 'Cloudflare',  ip: '1.1.1.1',          region: 'Global' },
-  { name: 'OpenDNS',     ip: '208.67.222.222',    region: 'US' },
-  { name: 'Quad9',       ip: '9.9.9.9',           region: 'CH' },
-  { name: 'Verisign',    ip: '64.6.64.6',         region: 'US' },
-  { name: 'AdGuard',     ip: '94.140.14.14',      region: 'CY' },
-  { name: 'Level3',      ip: '4.2.2.1',           region: 'US' },
-  { name: 'Alibaba',     ip: '223.5.5.5',         region: 'CN' },
-  { name: 'Baidu',       ip: '180.76.76.76',      region: 'CN' },
-  { name: 'KT',          ip: '168.126.63.1',      region: 'KR' },
-  { name: 'KDDI',        ip: '203.141.128.100',   region: 'JP' },
-  { name: 'Telstra',     ip: '139.130.4.4',       region: 'AU' },
+  { name: 'Google',      ip: '8.8.8.8',          region: 'US',     lat: 37.4,   lon: -122.1  },
+  { name: 'Cloudflare',  ip: '1.1.1.1',          region: 'Global', lat: 37.77,  lon: -122.42 },
+  { name: 'OpenDNS',     ip: '208.67.222.222',    region: 'US',     lat: 37.77,  lon: -122.41 },
+  { name: 'Quad9',       ip: '9.9.9.9',           region: 'CH',     lat: 47.37,  lon: 8.55    },
+  { name: 'Verisign',    ip: '64.6.64.6',         region: 'US',     lat: 38.95,  lon: -77.36  },
+  { name: 'AdGuard',     ip: '94.140.14.14',      region: 'CY',     lat: 34.68,  lon: 33.04   },
+  { name: 'Level3',      ip: '4.2.2.1',           region: 'US',     lat: 39.74,  lon: -104.99 },
+  { name: 'Alibaba',     ip: '223.5.5.5',         region: 'CN',     lat: 30.27,  lon: 120.15  },
+  { name: 'Baidu',       ip: '180.76.76.76',      region: 'CN',     lat: 39.9,   lon: 116.4   },
+  { name: 'KT',          ip: '168.126.63.1',      region: 'KR',     lat: 37.57,  lon: 126.98  },
+  { name: 'KDDI',        ip: '203.141.128.100',   region: 'JP',     lat: 35.68,  lon: 139.69  },
+  { name: 'Telstra',     ip: '139.130.4.4',       region: 'AU',     lat: -37.81, lon: 144.96  },
 ]
 
 const SUPPORTED_TYPES = new Set(['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT'])

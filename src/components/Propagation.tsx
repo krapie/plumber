@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
+import type { MapPoint } from './WorldMap'
+
+const WorldMap = lazy(() => import('./WorldMap'))
 
 const RECORD_TYPES = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT']
 
@@ -6,6 +9,8 @@ interface ResolverResult {
   name: string
   ip: string
   region: string
+  lat: number
+  lon: number
   values: string[]
   error: string | null
 }
@@ -14,22 +19,6 @@ interface PropResult {
   host: string
   type: string
   results: ResolverResult[]
-}
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 14, height: 14 }}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-    </svg>
-  )
-}
-
-function XIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: 14, height: 14 }}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-    </svg>
-  )
 }
 
 export default function Propagation() {
@@ -77,6 +66,15 @@ export default function Propagation() {
   const propagated = result ? result.results.filter(r => r.values.length > 0 && r.values.join('|') === canonical).length : 0
   const total = result ? result.results.length : 0
 
+  const points: MapPoint[] = result ? result.results.map(r => {
+    const hasData = r.values.length > 0
+    const status = r.error ? 'error' as const
+      : !hasData ? 'nodata' as const
+      : r.values.join('|') === canonical ? 'match' as const
+      : 'diff' as const
+    return { ...r, status }
+  }) : []
+
   return (
     <div className="kp-card prop-card">
       <form onSubmit={check} className="kp-input-row">
@@ -120,38 +118,9 @@ export default function Propagation() {
             )}
           </div>
 
-          <div className="prop-table">
-            <div className="prop-table-header">
-              <span>resolver</span>
-              <span>region</span>
-              <span>result</span>
-              <span />
-            </div>
-            {result.results.map(r => {
-              const match = r.values.length > 0 && r.values.join('|') === canonical
-              const noData = r.values.length === 0
-              return (
-                <div key={r.ip} className={'prop-table-row' + (match ? ' match' : noData ? ' empty' : ' diff')}>
-                  <span className="prop-resolver-name">{r.name}</span>
-                  <span className="prop-region">{r.region}</span>
-                  <span className="prop-value">
-                    {r.error
-                      ? <span className="prop-error-text">{r.error}</span>
-                      : noData
-                        ? <span className="prop-none">—</span>
-                        : r.values.map((v, i) => <span key={i} className="prop-val-item">{v}</span>)
-                    }
-                  </span>
-                  <span className="prop-status-icon">
-                    {!r.error && !noData && (match
-                      ? <span className="prop-icon-ok"><CheckIcon /></span>
-                      : <span className="prop-icon-diff"><XIcon /></span>
-                    )}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
+          <Suspense fallback={<p className="kp-empty">loading map…</p>}>
+            <WorldMap points={points} />
+          </Suspense>
         </>
       )}
 
