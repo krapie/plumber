@@ -104,10 +104,11 @@
   --kp-dur-base: 180ms;
   --kp-dur-slow: 280ms;
 
-  --kp-content-width:   920px;
-  --kp-wide-width:      1200px;
-  --kp-page-pad:        48px;
-  --kp-page-pad-mobile: 20px;
+  --kp-content-width:   1280px;
+  --kp-prose-width:     680px;
+  --kp-wide-width:      1440px;
+  --kp-page-pad:        clamp(16px, 2.5vw, 32px);
+  --kp-page-pad-mobile: 16px;
 }
 
 @media (prefers-color-scheme: dark) {
