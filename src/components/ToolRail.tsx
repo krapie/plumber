@@ -87,7 +87,7 @@ export default function ToolRail() {
 
   return (
     <aside className="kp-tool-rail">
-      <a href="https://kevinprk.com" className="kp-tool-rail-brand" aria-label="kevinprk.com">
+      <a href="/" className="kp-tool-rail-brand" aria-label="Plumber home">
         <span className="pi-mark">π</span>
         <span>Plumber</span>
       </a>
